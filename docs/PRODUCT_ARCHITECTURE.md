@@ -25,6 +25,13 @@ The wizard requests actual platform settings through Android system APIs. It mus
 
 Data migration is a separate permission-scoped component. It must not collect account passwords, promise universal app-data transfer, or modify the source device. See [SETUP_WIZARD.md](SETUP_WIZARD.md).
 
+## Setup implementation status
+
+The application-level prototype is in [setup/](../setup/). Its UI is implemented with native Android views, while a small Rust library provides state-transition bounds, transfer-category validation and SHA-256 integrity primitives through JNI. Rust is not used to replace Android framework services.
+
+The prototype opens Android settings for protected operations. Production integration still requires a privileged AOSP setup component, verified platform APIs and device-specific capability checks. The migration UI is a foundation only; a secure cross-device transport/receiver remains future work.
+
+
 ## Application compatibility policy
 GiggleOS will not claim that every Android app works. Compatibility depends on AOSP release, API level, ABI support, Google-dependent services, DRM, device integrations and app-specific restrictions.
 
