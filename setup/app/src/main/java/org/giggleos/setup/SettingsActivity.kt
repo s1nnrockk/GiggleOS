@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
@@ -286,11 +287,42 @@ class SettingsActivity : Activity() {
             .setTitle("Обои GiggleOS")
             .setSingleChoiceItems(options.map { it.second }.toTypedArray(), selected) { dialog, which ->
                 GiggleAppearance.saveWallpaper(this, options[which].first)
+                GiggleAppearance.clearCustomWallpaper(this)
                 dialog.dismiss()
                 Toast.makeText(this, "Обои применены к экрану блокировки.", Toast.LENGTH_SHORT).show()
             }
+            .setNeutralButton("Выбрать фото", null)
             .setNegativeButton("Закрыть", null)
             .show()
+            .apply {
+                getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                    val picker = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "image/*"
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+                    }
+                    try {
+                        startActivityForResult(picker, REQUEST_WALLPAPER)
+                        dismiss()
+                    } catch (_: Exception) {
+                        Toast.makeText(this@SettingsActivity, "Не удалось открыть галерею.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+    }
+
+    @Deprecated("Android document picker result")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != REQUEST_WALLPAPER || resultCode != Activity.RESULT_OK) return
+        val uri = data?.data ?: return
+        try {
+            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            GiggleAppearance.saveCustomWallpaper(this, uri)
+            Toast.makeText(this, "Фото установлено на экран блокировки.", Toast.LENGTH_SHORT).show()
+        } catch (_: Exception) {
+            Toast.makeText(this, "Не удалось сохранить выбранное фото.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun showAbout() {
@@ -312,4 +344,6 @@ class SettingsActivity : Activity() {
 
     private fun dp(value: Int): Int =
         (value * resources.displayMetrics.density + .5f).toInt()
+
+    companion object { private const val REQUEST_WALLPAPER = 7124 }
 }
