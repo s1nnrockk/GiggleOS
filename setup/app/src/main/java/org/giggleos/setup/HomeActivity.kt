@@ -11,6 +11,8 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.os.Build
+import android.app.role.RoleManager
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
@@ -25,6 +27,11 @@ import java.util.Locale
 
 /** Interactive home-screen prototype. Android remains responsible for launching installed apps. */
 class HomeActivity : Activity() {
+    companion object {
+        const val EXTRA_REQUEST_DEFAULT_HOME = "org.giggleos.setup.REQUEST_DEFAULT_HOME"
+        private const val HOME_ROLE_REQUEST = 701
+    }
+
     private val colors get() = GiggleAppearance.colors(this)
     private val ink get() = colors.text
     private val muted get() = colors.muted
@@ -37,6 +44,24 @@ class HomeActivity : Activity() {
         window.navigationBarColor = paper
         applySystemBarIcons()
         render()
+        if (intent.getBooleanExtra(EXTRA_REQUEST_DEFAULT_HOME, false)) requestDefaultHome()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun requestDefaultHome() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val roleManager = getSystemService(RoleManager::class.java)
+                if (roleManager != null && roleManager.isRoleAvailable(RoleManager.ROLE_HOME) &&
+                    !roleManager.isRoleHeld(RoleManager.ROLE_HOME)) {
+                    startActivityForResult(roleManager.createRequestRoleIntent(RoleManager.ROLE_HOME), HOME_ROLE_REQUEST)
+                }
+            } else {
+                startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
+            }
+        } catch (_: Exception) {
+            Toast.makeText(this, "Выбрать GiggleOS основным экраном можно в настройках приложений по умолчанию.", Toast.LENGTH_LONG).show()
+        }
     }
 
 
