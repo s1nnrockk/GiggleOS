@@ -4,7 +4,7 @@ Android first-run wizard and System UI interaction prototypes for GiggleOS.
 
 ## Modules
 
-- app/: native setup flow, lock-screen preview, credential handoff to Android Keyguard, and System UI preview.
+- app/: native setup flow, home screen, searchable installed-app drawer, settings hub, lock-screen preview, credential handoff to Android Keyguard, and System UI preview.
 - native/: Rust JNI library for setup navigation validation, transfer-category bitmask validation and SHA-256 integrity primitive. GitHub Actions builds and packages the arm64-v8a shared library into the APK.
 - docs/SETUP_WIZARD.md: first-run flow and data migration boundaries.
 - docs/LOCK_SCREEN_SECURITY.md: lock-screen preview and credential security contract.
