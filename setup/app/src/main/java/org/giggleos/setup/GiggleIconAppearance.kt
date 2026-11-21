@@ -3,8 +3,13 @@ package org.giggleos.setup
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Shader
+import android.graphics.BitmapShader
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -38,7 +43,7 @@ object GiggleIconAppearance {
                 val sample = maxOf(1, minOf(bounds.outWidth, bounds.outHeight) / 160)
                 val options = BitmapFactory.Options().apply { inSampleSize = sample.coerceAtLeast(1) }
                 val bitmap = activity.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
-                if (bitmap != null) return BitmapDrawable(activity.resources, bitmap)
+                if (bitmap != null) return RoundedImageBackground(bitmap, 19f * activity.resources.displayMetrics.density)
             } catch (_: Exception) { }
         }
         val color = prefs.getInt("color:$key", fallback)
@@ -97,4 +102,24 @@ object GiggleIconAppearance {
         }
         return true
     }
+}
+
+private class RoundedImageBackground(bitmap: Bitmap, private val radius: Float) : Drawable() {
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG).apply {
+        shader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+    }
+    private val bounds = RectF()
+
+    override fun onBoundsChange(bounds: android.graphics.Rect) {
+        this.bounds.set(bounds)
+    }
+
+    override fun draw(canvas: Canvas) {
+        canvas.drawRoundRect(bounds, radius, radius, paint)
+    }
+
+    override fun setAlpha(alpha: Int) { paint.alpha = alpha; invalidateSelf() }
+    override fun setColorFilter(colorFilter: android.graphics.ColorFilter?) { paint.colorFilter = colorFilter; invalidateSelf() }
+    @Deprecated("Deprecated in Android API")
+    override fun getOpacity(): Int = android.graphics.PixelFormat.TRANSLUCENT
 }
