@@ -5,6 +5,10 @@
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
         android:supportsRtl="true">
         <activity
+            android:name=".SystemUiPreviewActivity"
+            android:exported="false"
+            android:excludeFromRecents="true" />
+        <activity
             android:name=".LockScreenActivity"
             android:exported="false"
             android:excludeFromRecents="true" />
