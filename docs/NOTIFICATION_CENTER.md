@@ -7,6 +7,7 @@
 - Never reads or stores notification title, body, images, actions, or reply content.
 - Removes entries when Android reports the notification was removed.
 - The home control center shows a clear empty state until access is explicitly granted.
+- Tapping a record opens its source application, not the private notification content.
 - The user can clear the local notification index.
 
 ## Privacy and platform boundary
