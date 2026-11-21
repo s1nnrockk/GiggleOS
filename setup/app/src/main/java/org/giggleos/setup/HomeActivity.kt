@@ -273,7 +273,7 @@ class HomeActivity : Activity() {
             isFocusable = true
             setPadding(dp(3), dp(2), dp(3), dp(2))
             val icon = IconGlyphView(this@HomeActivity, app.iconKey).apply {
-                background = rounded(app.color, 19)
+                background = GiggleIconAppearance.background(this@HomeActivity, app.iconKey, app.color)
                 elevation = dp(2).toFloat()
             }
             addView(icon, LinearLayout.LayoutParams(dp(if (compact) 48 else 56), dp(if (compact) 48 else 56)))
@@ -293,6 +293,10 @@ class HomeActivity : Activity() {
                 } else {
                     launch(app.intent)
                 }
+            }
+            setOnLongClickListener {
+                GiggleIconAppearance.showEditor(this@HomeActivity, app.iconKey) { render() }
+                true
             }
             contentDescription = app.title
         }
@@ -392,6 +396,15 @@ class HomeActivity : Activity() {
             }
             .setNeutralButton("Все настройки") { _, _ -> launch(Intent(this, SettingsActivity::class.java)) }
             .show()
+    }
+
+    @Deprecated("Deprecated in Android API")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == GiggleIconAppearance.REQUEST_IMAGE) {
+            GiggleIconAppearance.handleImageResult(this, resultCode, data)
+            render()
+        }
     }
 
     private fun launch(intent: Intent) {
