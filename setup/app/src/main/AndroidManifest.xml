@@ -10,6 +10,15 @@
         android:label="GiggleOS"
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
         android:supportsRtl="true">
+        <service
+            android:name=".GiggleNotificationListenerService"
+            android:label="GiggleOS Notification Center"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
         <activity
             android:name=".AppDrawerActivity"
             android:exported="false" />
