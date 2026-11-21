@@ -88,17 +88,40 @@ class SystemUiPreviewActivity : Activity() {
         ))
         body.addView(space(22))
 
-        section(body, "Уведомления", "Реальная лента подключается внутри AOSP SystemUI.")
-        body.addView(LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            background = rounded(surface, 22)
-            setPadding(dp(18), dp(24), dp(18), dp(24))
-            addView(label("Всё спокойно", 17f, ink, true))
-            addView(label("Новых уведомлений нет", 13f, muted, false).apply {
-                setPadding(0, dp(7), 0, 0)
+        section(body, "Уведомления", "Содержимое сообщений не сохраняется и не показывается.")
+        val recentNotifications = GiggleNotifications.entries(this).take(5)
+        if (recentNotifications.isEmpty()) {
+            body.addView(LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER
+                background = rounded(surface, 22)
+                setPadding(dp(18), dp(24), dp(18), dp(24))
+                addView(label(
+                    if (GiggleNotifications.hasAccess(this@SystemUiPreviewActivity)) "Всё спокойно" else "Доступ не включён",
+                    17f, ink, true
+                ))
+                addView(label(
+                    if (GiggleNotifications.hasAccess(this@SystemUiPreviewActivity)) "Новых уведомлений нет" else "Разрешите доступ, чтобы видеть источник и время",
+                    13f, muted, false
+                ).apply { setPadding(0, dp(7), 0, 0) })
             })
-        })
+        } else {
+            recentNotifications.forEach { item ->
+                body.addView(actionRow(
+                    item.label,
+                    "Новое уведомление · ${java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(item.postedAt))}"
+                ) {
+                    packageManager.getLaunchIntentForPackage(item.packageName)?.let { startActivity(it) }
+                })
+                body.addView(space(7))
+            }
+        }
+        if (!GiggleNotifications.hasAccess(this)) {
+            body.addView(space(8))
+            body.addView(actionRow("Включить центр уведомлений", "Открыть настройки доступа") {
+                openSettings(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            })
+        }
         body.addView(space(22))
         section(body, "Управление устройством", "Действия передаются системным приложениям.")
         body.addView(actionRow("Экран блокировки", "Открыть предпросмотр") {
