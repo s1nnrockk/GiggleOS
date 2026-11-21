@@ -6,6 +6,7 @@
 - Personalization entries for display, theme-related Android settings and lock-screen preview.
 - Sound, notification, security, privacy, battery and accessibility entries.
 - About dialog reports the actual host device and Android version and clearly labels the build as a prototype.
+- Appearance settings persist system/light/dark mode and Ocean/Jade/Coral palette choices.
 - Protected system controls open Android's own settings activities instead of simulating privileged access.
 
 ## Boundary
