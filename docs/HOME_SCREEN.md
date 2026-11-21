@@ -5,6 +5,7 @@
 - A custom visual identity using a restrained teal/blue palette, layered cards and rounded app tiles.
 - Original vector-drawn line icons for the built-in app grid and dock; no emoji icon placeholders.
 - Home screen reads the saved light/dark mode and accent palette.
+- After first-run setup, Android's HOME role prompt lets the user explicitly choose GiggleOS as the default launcher; the app does not silently change the system default.
 - Dynamic-Island-inspired capsule used as an entry point to the control center.
 - App grid and dock with Android intent hand-off for dialer, messaging, camera, gallery, browser, settings, calendar, clock, files, contacts and audio apps.
 - Control center cards open real Android settings pages; they do not pretend to toggle privileged hardware state.
