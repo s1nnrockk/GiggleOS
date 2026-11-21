@@ -21,7 +21,9 @@
 - Обзор сторонних сборок: https://thecustomrom.com/devices/xiaomi/begonia
 - Дополнительный каталог устройства: https://customdroid.info/device/redmi-note-8-pro
 
-## Результат предварительного аудита\n\nНайдены публичные кандидаты device tree, kernel, vendor и firmware для begonia. Обнаружены несовпадение пути kernel checkout между BoardConfig и dependency manifest, разные Android-ветки и неурегулированный статус распространения proprietary blobs. Эти исходники пока нельзя считать согласованным комплектом для сборки. Подробности и точные ревизии зафиксированы в [BEGONIA_SOURCE_AUDIT.md](BEGONIA_SOURCE_AUDIT.md).\n\n## Следующие инженерные задачи
+## Результат предварительного аудита
+
+Найдены публичные кандидаты device tree, kernel, vendor и firmware для begonia. Обнаружены несовпадение пути kernel checkout между BoardConfig и dependency manifest, разные Android-ветки и неурегулированный статус распространения proprietary blobs. Эти исходники пока нельзя считать согласованным комплектом для сборки. Подробности и точные ревизии зафиксированы в [BEGONIA_SOURCE_AUDIT.md](BEGONIA_SOURCE_AUDIT.md).\n\n## Следующие инженерные задачи
 
 1. Подтвердить точный номер модели и объём RAM в «Настройки → О телефоне → Подробная информация и характеристики».
 2. Подтвердить codename `begonia` по системной информации устройства, не изменяя его загрузочные разделы.
