@@ -21,10 +21,11 @@ import android.widget.Toast
 
 /** GiggleOS settings hub that routes protected controls to Android's real settings pages. */
 class SettingsActivity : Activity() {
-    private val ink = Color.rgb(27, 43, 56)
-    private val muted = Color.rgb(101, 119, 132)
-    private val paper = Color.rgb(238, 244, 246)
-    private val blue = Color.rgb(42, 113, 135)
+    private val colors get() = GiggleAppearance.colors(this)
+    private val ink get() = colors.text
+    private val muted get() = colors.muted
+    private val paper get() = colors.background
+    private val blue get() = colors.accent
     private lateinit var content: LinearLayout
     private lateinit var search: EditText
 
@@ -41,8 +42,9 @@ class SettingsActivity : Activity() {
         Entry("Подключение", "Bluetooth", "Наушники и устройства рядом", Settings.ACTION_BLUETOOTH_SETTINGS),
         Entry("Подключение", "Мобильная сеть", "SIM-карты и мобильные данные", Settings.ACTION_WIRELESS_SETTINGS),
         Entry("Подключение", "Режим полёта", "Параметры беспроводной связи", Settings.ACTION_AIRPLANE_MODE_SETTINGS),
+        Entry("Персонализация", "Внешний вид GiggleOS", "Светлая и тёмная тема, цветовая палитра", special = "appearance"),
         Entry("Персонализация", "Экран и яркость", "Яркость, размер текста и тайм-аут", Settings.ACTION_DISPLAY_SETTINGS),
-        Entry("Персонализация", "Обои и оформление", "Цвета, фон и системная тема", Settings.ACTION_DISPLAY_SETTINGS),
+        Entry("Персонализация", "Обои и оформление", "Обои и системная тема Android", Settings.ACTION_DISPLAY_SETTINGS),
         Entry("Персонализация", "Экран блокировки", "Часы и предпросмотр блокировки", special = "lock"),
         Entry("Звуки и уведомления", "Звук и вибрация", "Громкость и системные сигналы", Settings.ACTION_SOUND_SETTINGS),
         Entry("Звуки и уведомления", "Уведомления", "Разрешения и каналы приложений", Settings.ACTION_APP_NOTIFICATION_SETTINGS),
@@ -58,9 +60,8 @@ class SettingsActivity : Activity() {
         super.onCreate(savedInstanceState)
         window.statusBarColor = paper
         window.navigationBarColor = paper
-        @Suppress("DEPRECATION")
-        window.decorView.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        applySystemBarIcons()
+
         render()
     }
 
@@ -92,7 +93,7 @@ class SettingsActivity : Activity() {
 
         val profile = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            background = rounded(Color.WHITE, 22)
+            background = rounded(colors.surface, 22)
             setPadding(dp(17), dp(15), dp(17), dp(15))
         }
         profile.addView(TextView(this).apply {
@@ -124,7 +125,7 @@ class SettingsActivity : Activity() {
             setSingleLine(true)
             setTextColor(ink)
             setHintTextColor(muted)
-            background = rounded(Color.WHITE, 16)
+            background = rounded(colors.surface, 16)
             setPadding(dp(15), 0, dp(15), 0)
         }
         root.addView(search, LinearLayout.LayoutParams(-1, dp(50)).apply {
@@ -175,7 +176,7 @@ class SettingsActivity : Activity() {
             })
             val card = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                background = rounded(Color.WHITE, 20)
+                background = rounded(colors.surface, 20)
                 setPadding(dp(14), dp(3), dp(14), dp(3))
             }
             rows.forEachIndexed { index, entry ->
@@ -210,7 +211,7 @@ class SettingsActivity : Activity() {
                 card.addView(row)
                 if (index != rows.lastIndex) {
                     card.addView(View(this@SettingsActivity).apply {
-                        setBackgroundColor(Color.rgb(235, 240, 242))
+                        setBackgroundColor(if (colors.dark) Color.rgb(53, 69, 80) else Color.rgb(235, 240, 242))
                         layoutParams = LinearLayout.LayoutParams(-1, dp(1))
                     })
                 }
@@ -223,6 +224,7 @@ class SettingsActivity : Activity() {
         when (entry.special) {
             "lock" -> startActivity(Intent(this, LockScreenActivity::class.java))
             "about" -> showAbout()
+            "appearance" -> showAppearance()
             else -> {
                 try {
                     startActivity(Intent(entry.action))
@@ -231,6 +233,35 @@ class SettingsActivity : Activity() {
                 }
             }
         }
+    }
+
+
+    private fun showAppearance() {
+        val modes = listOf("system", "light", "dark")
+        val palettes = listOf("ocean", "jade", "coral")
+        val modeLabels = mapOf("system" to "Как в системе", "light" to "Светлая", "dark" to "Тёмная")
+        val paletteLabels = mapOf("ocean" to "Океан", "jade" to "Нефрит", "coral" to "Коралл")
+        val choices = modes.flatMap { mode -> palettes.map { palette ->
+            "${modeLabels.getValue(mode)} · ${paletteLabels.getValue(palette)}" to (mode to palette)
+        } }
+        val current = GiggleAppearance.mode(this) to GiggleAppearance.palette(this)
+        val selected = choices.indexOfFirst { it.second == current }.coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("Внешний вид GiggleOS")
+            .setSingleChoiceItems(choices.map { it.first }.toTypedArray(), selected) { dialog, which ->
+                val choice = choices[which].second
+                GiggleAppearance.save(this, choice.first, choice.second)
+                dialog.dismiss()
+                recreate()
+            }
+            .setNegativeButton("Закрыть", null)
+            .show()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun applySystemBarIcons() {
+        window.decorView.systemUiVisibility = if (colors.dark) 0 else
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
     }
 
     private fun showAbout() {
