@@ -340,7 +340,11 @@ class MainActivity : Activity() {
                 hero(body, "Всё готово.", "Добро пожаловать в GiggleOS.")
                 body.addView(infoCard("Ваш телефон готов к настройке рабочего стола.", "Первоначальная настройка завершена. Выбранные параметры сохранены."))
                 body.addView(space(14))
-                body.addView(note("Готово", "Все шаги настройки пройдены. Можно переходить к использованию телефона."))
+                body.addView(note("Готово", "Все шаги настройки пройдены. Можно перейти к предпросмотру интерфейса GiggleOS."))
+                body.addView(space(12))
+                body.addView(actionButton("Открыть System UI", true) {
+                    startActivity(Intent(this, SystemUiPreviewActivity::class.java))
+                })
             }
         }
     }
