@@ -14,7 +14,7 @@
 This Activity is an app-level launcher prototype. It is not the privileged Android HOME role, does not replace the platform launcher or SystemUI, and cannot control protected device services. The browser tile uses a generic web intent; Android chooses the installed browser. Some app intents may be unavailable on a given device and show a fallback message.
 
 ## Next integration steps
-1. Add a proper HOME intent filter and onboarding/default-launcher flow after the platform build is selected.
+1. Connect the HOME role to the privileged platform launcher during AOSP integration.
 2. Add adaptive icon assets and refine icon accessibility labels.
 3. Add a real notification listener only with explicit user consent and lock-screen redaction.
 4. Move control center actions into privileged AOSP SystemUI for real Quick Settings.
