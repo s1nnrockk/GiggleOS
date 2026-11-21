@@ -44,7 +44,7 @@ class SettingsActivity : Activity() {
         Entry("Подключение", "Режим полёта", "Параметры беспроводной связи", Settings.ACTION_AIRPLANE_MODE_SETTINGS),
         Entry("Персонализация", "Внешний вид GiggleOS", "Светлая и тёмная тема, цветовая палитра", special = "appearance"),
         Entry("Персонализация", "Экран и яркость", "Яркость, размер текста и тайм-аут", Settings.ACTION_DISPLAY_SETTINGS),
-        Entry("Персонализация", "Обои и оформление", "Обои и системная тема Android", Settings.ACTION_DISPLAY_SETTINGS),
+        Entry("Персонализация", "Обои GiggleOS", "Выбрать фон экрана блокировки", special = "wallpaper"),
         Entry("Персонализация", "Экран блокировки", "Часы и предпросмотр блокировки", special = "lock"),
         Entry("Звуки и уведомления", "Звук и вибрация", "Громкость и системные сигналы", Settings.ACTION_SOUND_SETTINGS),
         Entry("Звуки и уведомления", "Уведомления", "Разрешения и каналы приложений", Settings.ACTION_APP_NOTIFICATION_SETTINGS),
@@ -225,6 +225,7 @@ class SettingsActivity : Activity() {
             "lock" -> startActivity(Intent(this, LockScreenActivity::class.java))
             "about" -> showAbout()
             "appearance" -> showAppearance()
+            "wallpaper" -> showWallpaper()
             else -> {
                 try {
                     startActivity(Intent(entry.action))
@@ -262,6 +263,26 @@ class SettingsActivity : Activity() {
     private fun applySystemBarIcons() {
         window.decorView.systemUiVisibility = if (colors.dark) 0 else
             View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+    }
+
+
+    private fun showWallpaper() {
+        val options = listOf(
+            "coast" to "Тихий берег",
+            "aurora" to "Северное сияние",
+            "dawn" to "Рассвет",
+            "meadow" to "Зелёная долина"
+        )
+        val selected = options.indexOfFirst { it.first == GiggleAppearance.wallpaper(this) }.coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("Обои GiggleOS")
+            .setSingleChoiceItems(options.map { it.second }.toTypedArray(), selected) { dialog, which ->
+                GiggleAppearance.saveWallpaper(this, options[which].first)
+                dialog.dismiss()
+                Toast.makeText(this, "Обои применены к экрану блокировки.", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Закрыть", null)
+            .show()
     }
 
     private fun showAbout() {
