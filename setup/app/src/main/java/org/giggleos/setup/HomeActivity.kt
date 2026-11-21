@@ -49,14 +49,21 @@ class HomeActivity : Activity() {
 
     @Suppress("DEPRECATION")
     private fun requestDefaultHome() {
+        val prefs = getSharedPreferences("giggle_setup", MODE_PRIVATE)
+        if (prefs.getBoolean("home_role_prompted", false)) return
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val roleManager = getSystemService(RoleManager::class.java)
-                if (roleManager != null && roleManager.isRoleAvailable(RoleManager.ROLE_HOME) &&
-                    !roleManager.isRoleHeld(RoleManager.ROLE_HOME)) {
-                    startActivityForResult(roleManager.createRequestRoleIntent(RoleManager.ROLE_HOME), HOME_ROLE_REQUEST)
+                if (roleManager != null && roleManager.isRoleAvailable(RoleManager.ROLE_HOME)) {
+                    if (roleManager.isRoleHeld(RoleManager.ROLE_HOME)) {
+                        prefs.edit().putBoolean("home_role_prompted", true).apply()
+                    } else {
+                        prefs.edit().putBoolean("home_role_prompted", true).apply()
+                        startActivityForResult(roleManager.createRequestRoleIntent(RoleManager.ROLE_HOME), HOME_ROLE_REQUEST)
+                    }
                 }
             } else {
+                prefs.edit().putBoolean("home_role_prompted", true).apply()
                 startActivity(Intent(Settings.ACTION_HOME_SETTINGS))
             }
         } catch (_: Exception) {
