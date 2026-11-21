@@ -20,9 +20,10 @@ import android.widget.Toast
 
 /** Searchable app drawer backed by the actual launchable apps installed on the host Android device. */
 class AppDrawerActivity : Activity() {
-    private val ink = Color.rgb(27, 43, 56)
-    private val muted = Color.rgb(101, 119, 132)
-    private val paper = Color.rgb(238, 244, 246)
+    private val colors get() = GiggleAppearance.colors(this)
+    private val ink get() = colors.text
+    private val muted get() = colors.muted
+    private val paper get() = colors.background
     private lateinit var list: LinearLayout
     private lateinit var search: EditText
     private data class AppEntry(val label: String, val packageName: String, val className: String, val icon: android.graphics.drawable.Drawable)
@@ -33,11 +34,16 @@ class AppDrawerActivity : Activity() {
         super.onCreate(savedInstanceState)
         window.statusBarColor = paper
         window.navigationBarColor = paper
-        @Suppress("DEPRECATION")
-        window.decorView.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        applySystemBarIcons()
         loadApps()
         render()
+    }
+
+
+    @Suppress("DEPRECATION")
+    private fun applySystemBarIcons() {
+        window.decorView.systemUiVisibility = if (colors.dark) 0 else
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
     }
 
     private fun loadApps() {
@@ -87,7 +93,7 @@ class AppDrawerActivity : Activity() {
             setSingleLine(true)
             setTextColor(ink)
             setHintTextColor(muted)
-            background = rounded(Color.WHITE, 17)
+            background = rounded(colors.surface, 17)
             setPadding(dp(15), 0, dp(15), 0)
             imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
         }
