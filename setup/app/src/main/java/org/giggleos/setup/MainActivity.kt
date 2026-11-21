@@ -308,7 +308,7 @@ class MainActivity : Activity() {
                 })
                 body.addView(space(12))
                 body.addView(actionButton("Настройки уведомлений", false) {
-                    openSettings(Intent(Settings.ACTION_NOTIFICATION_SETTINGS))
+                    openSettings(Intent("android.settings.NOTIFICATION_SETTINGS"))
                 })
                 body.addView(space(8))
                 body.addView(actionButton("Настройки звука", false) {
