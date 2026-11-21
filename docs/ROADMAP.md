@@ -29,6 +29,7 @@
 - [x] Добавить добровольный Notification Listener с локальным индексом без текста сообщений.
 - [x] Проверить Rust-тесты и Android assembleDebug в GitHub Actions.
 - [x] Сохранить APK-прототип как Actions artifact.
+- [x] Собирать Rust JNI для arm64-v8a и включать .so в APK через CI.
 - [ ] Проверить APK на физическом устройстве и пройти UI smoke-test.
 - [ ] Интегрировать Setup Wizard как привилегированный компонент AOSP.
 - [ ] Интегрировать System UI в AOSP SystemUI и подключить реальную ленту уведомлений/Quick Settings.
