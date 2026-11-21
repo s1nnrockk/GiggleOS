@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -70,6 +71,45 @@ def validate(path: Path) -> list[str]:
     return [codename, device["marketing_name"], project["support_status"]]
 
 
+def validate_upstream_candidates(path: Path, known_devices: set[str]) -> str:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if data.get("schema_version") != 1:
+        fail(path, "schema_version must be 1")
+    codename = data.get("device")
+    if not isinstance(codename, str) or codename != path.parent.name:
+        fail(path, "device must match the parent directory name")
+    if codename not in known_devices:
+        fail(path, "candidate manifest has no matching device.json profile")
+    if data.get("status") != "research_only_not_approved_for_build":
+        fail(path, "upstream candidates must remain research_only_not_approved_for_build")
+
+    candidates = data.get("candidates")
+    required_components = {"device_tree", "kernel", "vendor", "firmware"}
+    if not isinstance(candidates, dict) or not required_components.issubset(candidates):
+        fail(path, f"candidates must include {sorted(required_components)}")
+
+    for component in sorted(required_components):
+        entry = candidates[component]
+        if not isinstance(entry, dict):
+            fail(path, f"candidates.{component} must be an object")
+        repository = entry.get("repository")
+        branch = entry.get("branch")
+        commit = entry.get("commit")
+        if not isinstance(repository, str) or not repository.startswith("https://github.com/"):
+            fail(path, f"candidates.{component}.repository must be a GitHub HTTPS URL")
+        if not isinstance(branch, str) or not branch.strip():
+            fail(path, f"candidates.{component}.branch must be non-empty")
+        if not isinstance(commit, str) or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
+            fail(path, f"candidates.{component}.commit must be a full lowercase Git SHA")
+        if entry.get("build_status") != "not_tested":
+            fail(path, f"candidates.{component}.build_status must remain not_tested")
+
+    blockers = data.get("blockers")
+    if not isinstance(blockers, list) or not blockers or any(not isinstance(item, str) or not item.strip() for item in blockers):
+        fail(path, "blockers must be a non-empty list of descriptions")
+    return codename
+
+
 def main() -> int:
     profiles = sorted(DEVICE_ROOT.glob("*/device.json"))
     if not profiles:
@@ -90,11 +130,16 @@ def main() -> int:
             print(f"OK  {codename}: {name} [{status}]")
         if first_targets != 1:
             raise ValueError(f"expected exactly one first_target device, found {first_targets}")
+
+        candidate_manifests = sorted(DEVICE_ROOT.glob("*/upstream-candidates.json"))
+        for path in candidate_manifests:
+            codename = validate_upstream_candidates(path, seen)
+            print(f"OK  {codename}: upstream candidates pinned for research only")
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
 
-    print(f"Validated {len(profiles)} device profile(s). No firmware was built.")
+    print(f"Validated {len(profiles)} device profile(s) and {len(candidate_manifests)} upstream candidate manifest(s). No firmware was built.")
     return 0
 
 
