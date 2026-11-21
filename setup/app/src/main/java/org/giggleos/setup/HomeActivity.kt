@@ -132,13 +132,27 @@ class HomeActivity : Activity() {
         }
         content.addView(glance, LinearLayout.LayoutParams(-1, dp(154)))
 
-        content.addView(TextView(this).apply {
+        val appsHeader = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(2), dp(24), 0, dp(13))
+        }
+        appsHeader.addView(TextView(this).apply {
             text = "Приложения"
             textSize = 18f
             setTextColor(ink)
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-            setPadding(dp(2), dp(24), 0, dp(13))
+        }, LinearLayout.LayoutParams(0, -2, 1f))
+        appsHeader.addView(TextView(this).apply {
+            text = "Все приложения  ›"
+            textSize = 12f
+            setTextColor(Color.rgb(42, 113, 135))
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { startActivity(Intent(this@HomeActivity, AppDrawerActivity::class.java)) }
         })
+        appsHeader.setOnClickListener { startActivity(Intent(this, AppDrawerActivity::class.java)) }
+        content.addView(appsHeader)
 
         val apps = listOf(
             App("Телефон", "phone", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
@@ -181,7 +195,7 @@ class HomeActivity : Activity() {
         }
         listOf(
             App("Телефон", "phone", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
-            App("Браузер", "browser", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))),
+            App("Браузер", "browser", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://www.google.com"))),
             App("Камера", "camera", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
             App("Настройки", "settings", Color.rgb(104, 119, 132), Intent(this, SettingsActivity::class.java))
         ).forEach { app ->
