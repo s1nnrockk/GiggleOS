@@ -9,7 +9,7 @@
 ## Архитектура
 
 - **Основа:** Android Open Source Project (AOSP).
-- **Первый device bring-up:** изучение совместимого upstream-порта LineageOS для выбранного устройства; собственные изменения GiggleOS будут поддерживаться отдельно.
+- **Первый device bring-up:** аудит совместимых upstream/community исходных деревьев для выбранного устройства; собственные изменения GiggleOS будут поддерживаться отдельно.
 - **Низкий уровень:** Linux kernel, HAL, device tree и vendor-компоненты конкретного устройства.
 - **Системный опыт:** собственный System UI, настройки и приложения.
 - **Сборка:** Android build system / Soong и отдельные конфигурации устройств.
@@ -17,9 +17,11 @@
 
 ## Первый целевой телефон
 
-Первый кандидат — Xiaomi Redmi Note 8, codename `ginkgo`. Точная модель пользователя пока не подтверждена. В документации LineageOS есть отдельные варианты Redmi Note 8 и Redmi Note 8T в рамках семейства сборки `ginkgo`; Redmi Note 8 (2021) — отдельная платформа `biloba`. Перед любым образом необходимо сверить точный номер модели и вариант устройства.
+Первый целевой телефон подтверждён пользователем: **Xiaomi Redmi Note 8 Pro**, codename `begonia`. Точный номер модели и объём RAM ещё предстоит проверить.
 
-См. [матрицу поддержки](docs/DEVICE_SUPPORT.md), [исследование порта ginkgo](docs/PORTING_GINKGO.md) и [план разработки](docs/ROADMAP.md).
+Redmi Note 8 Pro использует платформу MediaTek Helio G90T и требует отдельного device-port. Не путать его с Redmi Note 8 (`ginkgo`, Snapdragon) и Redmi Note 8 (2021) (`biloba`). Для `begonia` нельзя автоматически считать официальную поддержку LineageOS доступной: найденные сторонние/community сборки требуют отдельного аудита и не являются сборками GiggleOS.
+
+См. [матрицу поддержки](docs/DEVICE_SUPPORT.md), [исследование порта begonia](docs/PORTING_BEGONIA.md) и [план разработки](docs/ROADMAP.md). Предыдущие заметки по ginkgo сохранены как исторический материал: [PORTING_GINKGO](docs/PORTING_GINKGO.md).
 
 ## Поддержка устройств
 
