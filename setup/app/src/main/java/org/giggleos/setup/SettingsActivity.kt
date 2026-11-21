@@ -48,6 +48,7 @@ class SettingsActivity : Activity() {
         Entry("Персонализация", "Экран блокировки", "Часы и предпросмотр блокировки", special = "lock"),
         Entry("Звуки и уведомления", "Звук и вибрация", "Громкость и системные сигналы", Settings.ACTION_SOUND_SETTINGS),
         Entry("Звуки и уведомления", "Уведомления", "Разрешения и каналы приложений", Settings.ACTION_APP_NOTIFICATION_SETTINGS),
+        Entry("Звуки и уведомления", "Центр уведомлений GiggleOS", "Доступ включается только с вашего разрешения", special = "notification_access"),
         Entry("Звуки и уведомления", "Не беспокоить", "Режим тишины и расписание", Settings.ACTION_ZEN_MODE_PRIORITY_SETTINGS),
         Entry("Безопасность", "Защита и блокировка", "PIN-код, пароль и биометрия", Settings.ACTION_SECURITY_SETTINGS),
         Entry("Безопасность", "Конфиденциальность", "Разрешения и доступ приложений", Settings.ACTION_PRIVACY_SETTINGS),
@@ -226,6 +227,13 @@ class SettingsActivity : Activity() {
             "about" -> showAbout()
             "appearance" -> showAppearance()
             "wallpaper" -> showWallpaper()
+            "notification_access" -> {
+                try {
+                    startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                } catch (_: Exception) {
+                    Toast.makeText(this, "Настройка доступа недоступна на этом устройстве.", Toast.LENGTH_SHORT).show()
+                }
+            }
             else -> {
                 try {
                     startActivity(Intent(entry.action))
