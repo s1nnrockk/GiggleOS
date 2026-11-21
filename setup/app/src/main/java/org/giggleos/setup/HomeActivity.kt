@@ -361,6 +361,12 @@ class HomeActivity : Activity() {
                     setTextColor(ink)
                     background = rounded(colors.surface, 16)
                     setPadding(dp(14), dp(12), dp(14), dp(12))
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener {
+                        val launchIntent = packageManager.getLaunchIntentForPackage(item.packageName)
+                        if (launchIntent != null) launch(launchIntent)
+                    }
                 })
                 panel.addView(space(6))
             }
@@ -371,7 +377,7 @@ class HomeActivity : Activity() {
             .setPositiveButton(if (GiggleNotifications.hasAccess(this)) "Очистить список" else "Включить доступ") { _, _ ->
                 if (GiggleNotifications.hasAccess(this)) {
                     GiggleNotifications.clear(this)
-                    showControlCenter()
+                    Toast.makeText(this, "Список уведомлений очищен.", Toast.LENGTH_SHORT).show()
                 } else {
                     launch(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
                 }
