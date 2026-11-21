@@ -260,9 +260,9 @@ class MainActivity : Activity() {
             }
             6 -> {
                 hero(body, "Защитите телефон.", "Настройте способ разблокировки экрана.")
-                choiceList(body, listOf("Настроить позже", "PIN-код или пароль", "Графический ключ"), lockChoice) {
+                body.addView(choiceList(body, listOf("Настроить позже", "PIN-код или пароль", "Графический ключ"), lockChoice) {
                     lockChoice = it; persist(); render()
-                }
+                })
                 body.addView(space(10))
                 body.addView(actionButton("Открыть системные настройки блокировки", false) {
                     openSettings(Intent(Settings.ACTION_SECURITY_SETTINGS))
@@ -293,7 +293,10 @@ class MainActivity : Activity() {
                 body.addView(choiceList(body, listOf("Показывать содержимое", "Скрывать личные данные", "Не показывать"), notificationPrivacy) {
                     notificationPrivacy = it; persist(); render()
                 })
-                body.addView(note("Персонализация", "Предпросмотр показывает выбранный стиль. Настройки экрана блокировки можно будет открыть отдельно."))
+                body.addView(actionButton("Открыть экран блокировки", true) {
+                    startActivity(Intent(this, LockScreenActivity::class.java))
+                })
+                body.addView(note("Персонализация", "Это экран предпросмотра GiggleOS. Реальный системный экран блокировки появится после интеграции System UI в AOSP."))
             }
             9 -> {
                 hero(body, "Настройте ощущения.", "Выберите тему и способ навигации.")
