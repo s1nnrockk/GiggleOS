@@ -23,6 +23,9 @@
             android:name=".AppDrawerActivity"
             android:exported="false" />
         <activity
+            android:name=".GiggleStoreActivity"
+            android:exported="false" />
+        <activity
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity
