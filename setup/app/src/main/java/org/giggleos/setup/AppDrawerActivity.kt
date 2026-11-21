@@ -164,6 +164,7 @@ class AppDrawerActivity : Activity() {
                     setOnClickListener { launchApp(app) }
                     contentDescription = "Открыть ${app.label}"
                 }
+                GiggleMotion.attachPress(tile, this@AppDrawerActivity)
                 row.addView(tile, LinearLayout.LayoutParams(0, dp(98), 1f))
             }
             repeat(4 - rowApps.size) {
