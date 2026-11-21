@@ -20,12 +20,30 @@ object GiggleAppearance {
     private const val PREFS = "giggle_appearance"
     private const val MODE = "mode"
     private const val PALETTE = "palette"
+    private const val WALLPAPER = "wallpaper"
 
     fun mode(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(MODE, "system") ?: "system"
 
     fun palette(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(PALETTE, "ocean") ?: "ocean"
+
+
+    fun wallpaper(context: Context): String =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(WALLPAPER, "coast") ?: "coast"
+
+    fun saveWallpaper(context: Context, wallpaper: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putString(WALLPAPER, wallpaper)
+            .apply()
+    }
+
+    fun wallpaperColors(context: Context): Pair<Int, Int> = when (wallpaper(context)) {
+        "aurora" -> Color.rgb(33, 111, 111) to Color.rgb(21, 48, 76)
+        "dawn" -> Color.rgb(181, 111, 99) to Color.rgb(91, 67, 92)
+        "meadow" -> Color.rgb(100, 143, 115) to Color.rgb(38, 77, 78)
+        else -> Color.rgb(48, 112, 143) to Color.rgb(19, 43, 70)
+    }
 
     fun save(context: Context, mode: String, palette: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
