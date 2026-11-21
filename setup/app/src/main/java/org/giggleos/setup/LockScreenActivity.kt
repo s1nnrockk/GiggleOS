@@ -97,7 +97,7 @@ class LockScreenActivity : Activity() {
 
     private fun render() {
         val root = FrameLayout(this).apply {
-            val wallpaper = GiggleAppearance.wallpaperColors(this)
+            val wallpaper = GiggleAppearance.wallpaperColors(this@LockScreenActivity)
             background = GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
                 intArrayOf(
