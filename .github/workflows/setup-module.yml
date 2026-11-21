@@ -45,3 +45,8 @@ jobs:
       - run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - run: gradle --no-daemon :app:assembleDebug
         working-directory: setup
+      - uses: actions/upload-artifact@v4
+        with:
+          name: giggleos-setup-debug
+          path: setup/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
