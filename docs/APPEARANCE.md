@@ -4,7 +4,7 @@ The prototype now stores a shared appearance choice:
 - Appearance mode: follow Android system, light, or dark.
 - Accent palette: Ocean, Jade, or Coral.
 - Lock-screen wallpaper presets: Quiet Coast, Northern Lights, Dawn, and Meadow.
-- The selected accent also recolors the lock-screen preview; home, settings and app drawer use the shared palette and light/dark surface colors.
+- The selected accent also recolors the lock-screen preview; home, settings, app drawer and System UI preview use the shared palette and light/dark surface colors.
 - Choices persist in app-private SharedPreferences and are read by GiggleOS UI activities.
 - No privileged Android theme APIs or overlay permissions are requested.
 
