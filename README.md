@@ -32,6 +32,11 @@ Redmi Note 8 Pro использует платформу MediaTek Helio G90T и 
 
 См. [матрицу поддержки](docs/DEVICE_SUPPORT.md), [исследование порта begonia](docs/PORTING_BEGONIA.md), [план разработки](docs/ROADMAP.md) и [профиль устройства](devices/begonia/device.json).
 
+## Setup Wizard prototype
+
+A native Android source prototype for the first-run flow is available in [setup/](setup/README.md). It contains twelve setup screens and a Rust JNI core for navigation bounds, transfer-category validation and SHA-256 integrity primitives. It is not yet the privileged AOSP first-boot wizard, and no APK or firmware image is claimed as built.
+
+
 ## Поддержка устройств
 Каждая модель требует собственной проверки загрузчика, разметки разделов, ядра, драйверов, vendor blobs и аппаратных функций. Новые устройства добавляются отдельными портами и проходят тестирование до публикации.
 
