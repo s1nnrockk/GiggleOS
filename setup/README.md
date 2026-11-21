@@ -1,14 +1,34 @@
 # GiggleOS Setup
 
-Native Android first-run wizard prototype source.
+Android first-run wizard prototype for the GiggleOS platform.
+
+## Screens
+
+The native Android activity contains the complete first-run navigation flow:
+1. Welcome
+2. Language
+3. Region and time
+4. Wi-Fi entry point
+5. SIM and mobile-network entry point
+6. Data-transfer source and category selection
+7. Screen-lock setup entry point
+8. Biometric enrollment entry point
+9. Lock-screen clock and notification privacy preview
+10. Appearance, navigation and accessibility preferences
+11. Review
+12. Finish
+
+The UI uses Android platform widgets and a custom GiggleOS visual layer. It does not depend on a webview or a component-template framework.
 
 ## Modules
-- `app/`: Android UI and platform-intent integration.
-- `native/`: Rust state validation and migration-package integrity primitives.
-- `docs/SETUP_WIZARD.md`: full product flow and limitations.
+
+- `app/`: Android UI, progress persistence and platform settings entry points.
+- `native/`: Rust navigation validation, transfer-category bitmask validation and SHA-256 integrity primitive.
+- `docs/SETUP_WIZARD.md`: product behavior, data-transfer boundaries and AOSP integration contract.
 
 ## Build the Rust library on Windows
-Install Rust, Android NDK and Android SDK, then install cargo-ndk:
+
+Install Rust, Android Studio/SDK and Android NDK. Then install cargo-ndk:
 
 ```powershell
 cargo install cargo-ndk
@@ -16,11 +36,21 @@ cd setup/native
 .\build-android.ps1
 ```
 
-Then build the Android module from the `setup` directory with Android Studio or Gradle.
+Build the Android prototype from the `setup` directory using Android Studio or Gradle:
 
-The Kotlin app has a safe fallback if the Rust shared library has not been built yet. Rust acceleration is active only when `libgiggle_setup_core.so` is present.
+```powershell
+gradle :app:assembleDebug
+```
 
-## Platform integration status
-This is an application-level prototype. A production first-boot wizard must be integrated as a privileged AOSP setup component and connected to the selected device's verified system services. Wi-Fi, SIM, lock credentials and biometrics are opened through Android settings entry points here; this prototype does not silently change protected system settings.
+The Kotlin activity has a fallback for environments where the Rust shared library has not yet been built. The Rust core is loaded when `libgiggle_setup_core.so` is present under the matching Android ABI.
 
-Data migration UI and category selection are present as a flow foundation. A complete cross-device transfer protocol and receiver are not implemented yet.
+## What is and is not functional
+
+- Step navigation and progress persistence are implemented.
+- Language, region, appearance, navigation and lock-screen preview choices are stored by the prototype.
+- Wi-Fi, date/time, security, biometric and accessibility actions open Android system settings. They do not bypass platform permission checks.
+- Data-source and category selection are implemented, but the cross-device transport, pairing protocol and receiver are not implemented.
+- Selected appearance and lock-screen preferences are not yet applied to the real System UI.
+- The activity is not yet registered as the privileged first-boot Setup Wizard in AOSP.
+
+This is source code for an application-level prototype. No APK, system image or flashable firmware has been built or device-tested yet.
