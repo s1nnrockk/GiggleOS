@@ -61,7 +61,7 @@ class MainActivity : Activity() {
 
         val prefs = getSharedPreferences("giggle_setup", MODE_PRIVATE)
         if (prefs.getBoolean("setup_complete", false)) {
-            startActivity(Intent(this, HomeActivity::class.java))
+            startActivity(Intent(this, HomeActivity::class.java).putExtra(HomeActivity.EXTRA_REQUEST_DEFAULT_HOME, true))
             finish()
             return
         } else {
