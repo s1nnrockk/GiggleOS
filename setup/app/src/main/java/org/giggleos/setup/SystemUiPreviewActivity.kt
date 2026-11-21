@@ -110,7 +110,7 @@ class SystemUiPreviewActivity : Activity() {
         })
         body.addView(space(8))
         body.addView(actionRow("Все настройки", "Открыть настройки Android") {
-            openSettings(Settings.ACTION_SETTINGS)
+            startActivity(Intent(this, SettingsActivity::class.java))
         })
         body.addView(space(18))
         body.addView(label("ПРОТОТИП SYSTEM UI · НЕ ЗАМЕНЯЕТ СИСТЕМНУЮ ШТОРКУ", 9f, Color.rgb(128, 154, 170), true).apply {
