@@ -1,0 +1,327 @@
+package org.giggleos.setup
+
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
+import android.provider.Settings
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.TextClock
+import android.widget.TextView
+import android.widget.Toast
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+/** Interactive home-screen prototype. Android remains responsible for launching installed apps. */
+class HomeActivity : Activity() {
+    private val ink = Color.rgb(27, 43, 56)
+    private val muted = Color.rgb(101, 119, 132)
+    private val paper = Color.rgb(238, 244, 246)
+    private val white = Color.WHITE
+    private val accent = Color.rgb(42, 113, 135)
+    private val deep = Color.rgb(22, 56, 75)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.statusBarColor = paper
+        window.navigationBarColor = paper
+        @Suppress("DEPRECATION")
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        render()
+    }
+
+    private fun render() {
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(paper)
+            setPadding(dp(20), dp(12), dp(20), dp(12))
+        }
+
+        val status = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        status.addView(TextClock(this).apply {
+            format12Hour = "h:mm"
+            format24Hour = "HH:mm"
+            textSize = 14f
+            setTextColor(ink)
+            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+        }, LinearLayout.LayoutParams(0, dp(30), 1f))
+        val island = TextView(this).apply {
+            text = "●  GIGGLE"
+            textSize = 10f
+            letterSpacing = .08f
+            gravity = Gravity.CENTER
+            setTextColor(Color.WHITE)
+            background = rounded(Color.rgb(20, 28, 35), 22)
+            setPadding(dp(17), dp(8), dp(17), dp(8))
+            isClickable = true
+            isFocusable = true
+            contentDescription = "Открыть быстрые настройки"
+            setOnClickListener { showControlCenter() }
+        }
+        status.addView(island)
+        status.addView(TextView(this).apply {
+            text = batteryText()
+            textSize = 11f
+            setTextColor(muted)
+            gravity = Gravity.END or Gravity.CENTER_VERTICAL
+        }, LinearLayout.LayoutParams(0, dp(30), 1f))
+        root.addView(status)
+
+        val scroll = ScrollView(this).apply { clipToPadding = false }
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(22), 0, dp(12))
+        }
+
+        val date = TextClock(this).apply {
+            format12Hour = "EEEE, d MMMM"
+            format24Hour = "EEEE, d MMMM"
+            textSize = 13f
+            setTextColor(muted)
+            letterSpacing = .02f
+        }
+        content.addView(date)
+        content.addView(TextView(this).apply {
+            text = "Хорошего дня"
+            textSize = 31f
+            letterSpacing = -.04f
+            setTextColor(ink)
+            typeface = Typeface.create("sans-serif", Typeface.NORMAL)
+            setPadding(0, dp(4), 0, dp(16))
+        })
+
+        val glance = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                intArrayOf(Color.rgb(65, 139, 153), Color.rgb(35, 83, 108))
+            ).apply { cornerRadius = dp(28).toFloat() }
+            setPadding(dp(20), dp(18), dp(20), dp(18))
+            addView(TextView(this@HomeActivity).apply {
+                text = "GIGGLEOS"
+                textSize = 10f
+                letterSpacing = .18f
+                setTextColor(Color.rgb(210, 239, 239))
+                typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            })
+            addView(TextView(this@HomeActivity).apply {
+                text = SimpleDateFormat("d", Locale.getDefault()).format(Date())
+                textSize = 52f
+                setTextColor(Color.WHITE)
+                typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
+                setPadding(0, dp(3), 0, 0)
+            })
+            addView(TextView(this@HomeActivity).apply {
+                text = "Ваше пространство. Ваш ритм."
+                textSize = 13f
+                setTextColor(Color.rgb(223, 239, 241))
+            })
+        }
+        content.addView(glance, LinearLayout.LayoutParams(-1, dp(154)))
+
+        content.addView(TextView(this).apply {
+            text = "Приложения"
+            textSize = 18f
+            setTextColor(ink)
+            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            setPadding(dp(2), dp(24), 0, dp(13))
+        })
+
+        val apps = listOf(
+            App("Телефон", "☎", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
+            App("Сообщения", "▤", Color.rgb(65, 139, 190), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_MESSAGING")),
+            App("Камера", "◉", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
+            App("Фото", "▧", Color.rgb(198, 113, 93), Intent(Intent.ACTION_VIEW).setType("image/*")),
+            App("Браузер", "◎", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))),
+            App("Настройки", "⚙", Color.rgb(104, 119, 132), Intent(Settings.ACTION_SETTINGS)),
+            App("Календарь", "▦", Color.rgb(190, 88, 82), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_CALENDAR")),
+            App("Часы", "◷", Color.rgb(65, 111, 145), Intent("android.intent.action.SHOW_ALARMS")),
+            App("Файлы", "▱", Color.rgb(187, 145, 68), Intent(Intent.ACTION_GET_CONTENT).setType("*/*")),
+            App("Контакты", "♙", Color.rgb(76, 143, 128), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_CONTACTS")),
+            App("Музыка", "♫", Color.rgb(158, 99, 142), Intent(Intent.ACTION_VIEW).setType("audio/*")),
+            App("System UI", "⌘", deep, null)
+        )
+        val rows = apps.chunked(4)
+        rows.forEach { rowApps ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.TOP
+            }
+            rowApps.forEach { app ->
+                row.addView(appTile(app), LinearLayout.LayoutParams(0, dp(104), 1f))
+            }
+            repeat(4 - rowApps.size) {
+                row.addView(View(this), LinearLayout.LayoutParams(0, dp(104), 1f))
+            }
+            content.addView(row)
+        }
+
+        scroll.addView(content)
+        root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+
+        val dock = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            background = rounded(Color.argb(225, 255, 255, 255), 28)
+            setPadding(dp(8), dp(9), dp(8), dp(9))
+            elevation = dp(5).toFloat()
+        }
+        listOf(
+            App("Телефон", "☎", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
+            App("Браузер", "◎", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))),
+            App("Камера", "◉", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
+            App("Настройки", "⚙", Color.rgb(104, 119, 132), Intent(Settings.ACTION_SETTINGS))
+        ).forEach { app ->
+            dock.addView(appTile(app, compact = true), LinearLayout.LayoutParams(0, dp(62), 1f))
+        }
+        root.addView(dock, LinearLayout.LayoutParams(-1, dp(76)).apply {
+            topMargin = dp(8)
+            bottomMargin = dp(4)
+        })
+
+        setContentView(root)
+        val animations = try {
+            Settings.Global.getFloat(contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
+        } catch (_: Exception) { true }
+        if (animations) {
+            root.alpha = 0f
+            root.translationY = dp(7).toFloat()
+            root.animate().alpha(1f).translationY(0f).setDuration(220L).start()
+        }
+    }
+
+    private data class App(val title: String, val glyph: String, val color: Int, val intent: Intent?)
+
+    private fun appTile(app: App, compact: Boolean = false): View {
+        val tile = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+            isClickable = true
+            isFocusable = true
+            setPadding(dp(3), dp(2), dp(3), dp(2))
+            val icon = TextView(this@HomeActivity).apply {
+                text = app.glyph
+                textSize = if (compact) 23f else 25f
+                gravity = Gravity.CENTER
+                setTextColor(Color.WHITE)
+                background = rounded(app.color, 19)
+                elevation = dp(2).toFloat()
+            }
+            addView(icon, LinearLayout.LayoutParams(dp(if (compact) 48 else 56), dp(if (compact) 48 else 56)))
+            if (!compact) {
+                addView(TextView(this@HomeActivity).apply {
+                    text = app.title
+                    textSize = 10f
+                    gravity = Gravity.CENTER
+                    setTextColor(ink)
+                    maxLines = 1
+                    setPadding(0, dp(6), 0, 0)
+                })
+            }
+            setOnClickListener {
+                if (app.intent == null) {
+                    startActivity(Intent(this@HomeActivity, SystemUiPreviewActivity::class.java))
+                } else {
+                    launch(app.intent)
+                }
+            }
+            contentDescription = app.title
+        }
+        return tile
+    }
+
+    private fun showControlCenter() {
+        val panel = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(22), dp(20), dp(22), dp(20))
+            background = rounded(Color.rgb(239, 245, 247), 28)
+        }
+        panel.addView(TextView(this).apply {
+            text = "Центр управления"
+            textSize = 22f
+            setTextColor(ink)
+            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            setPadding(0, 0, 0, dp(14))
+        })
+        val actions = listOf(
+            "Wi-Fi" to Settings.ACTION_WIFI_SETTINGS,
+            "Bluetooth" to Settings.ACTION_BLUETOOTH_SETTINGS,
+            "Экран" to Settings.ACTION_DISPLAY_SETTINGS,
+            "Звук" to Settings.ACTION_SOUND_SETTINGS,
+            "Батарея" to Settings.ACTION_BATTERY_SAVER_SETTINGS,
+            "Защита" to Settings.ACTION_SECURITY_SETTINGS
+        )
+        actions.chunked(2).forEach { pair ->
+            val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            pair.forEach { (label, action) ->
+                val button = TextView(this).apply {
+                    text = label
+                    textSize = 14f
+                    gravity = Gravity.CENTER
+                    setTextColor(ink)
+                    background = rounded(Color.WHITE, 18)
+                    setPadding(dp(8), dp(17), dp(8), dp(17))
+                    isClickable = true
+                    setOnClickListener { launch(Intent(action)) }
+                }
+                row.addView(button, LinearLayout.LayoutParams(0, dp(58), 1f).apply {
+                    if (label == pair.first().first) rightMargin = dp(6) else leftMargin = dp(6)
+                })
+            }
+            panel.addView(row)
+            panel.addView(space(8))
+        }
+        panel.addView(TextView(this).apply {
+            text = "Уведомления\n\nНовых уведомлений нет"
+            textSize = 14f
+            gravity = Gravity.CENTER
+            setTextColor(muted)
+            background = rounded(Color.WHITE, 18)
+            setPadding(dp(12), dp(22), dp(12), dp(22))
+        })
+        AlertDialog.Builder(this)
+            .setView(panel)
+            .setNegativeButton("Закрыть", null)
+            .setNeutralButton("Все настройки") { _, _ -> launch(Intent(Settings.ACTION_SETTINGS)) }
+            .show()
+    }
+
+    private fun launch(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (_: Exception) {
+            Toast.makeText(this, "Подходящее приложение не найдено.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun batteryText(): String {
+        val intent = registerReceiver(null, android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val level = intent?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale = intent?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1) ?: -1
+        return if (level >= 0 && scale > 0) "▰ ${level * 100 / scale}%" else "GIGGLEOS"
+    }
+
+    private fun rounded(color: Int, radius: Int) = GradientDrawable().apply {
+        setColor(color)
+        cornerRadius = dp(radius).toFloat()
+    }
+
+    private fun space(height: Int) = View(this).apply {
+        layoutParams = LinearLayout.LayoutParams(1, dp(height))
+    }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density + .5f).toInt()
+}
