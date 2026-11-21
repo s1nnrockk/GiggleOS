@@ -71,5 +71,19 @@ Show the selected clock layout, wallpaper crop/readability, notification visibil
 ## Redmi Note 8 Pro (begonia) constraints
 The exact model number and RAM variant are not confirmed. Fingerprint, telephony, Wi-Fi, Bluetooth and other hardware features must be validated against the selected AOSP base and device-specific HAL/vendor implementation before their setup screens are enabled.
 
+## Prototype implementation
+
+An application-level Android source prototype now lives in [setup/](../setup/):
+- Native Android screens for all twelve steps, with back/continue/skip navigation and saved progress.
+- Real system-settings entry points for Wi-Fi, date/time, security, biometric enrollment and accessibility.
+- Lock-screen preview choices, appearance/navigation choices and a review screen.
+- A Rust JNI core for bounded wizard navigation, transfer-category validation and SHA-256 integrity checks.
+- Release profile uses LTO, one codegen unit, stripping and maximum optimization.
+- GitHub Actions checks the Rust core and compiles the Android prototype.
+
+The prototype deliberately does not claim to be the production AOSP Setup Wizard. System-level preferences still need privileged platform integration. Data source/category selection exists, but the cross-device transport and receiver are not implemented. The lock-screen and appearance selections are currently stored as setup preferences and are not yet applied to the actual System UI.
+
+**Current status:** source prototype added. No successful CI run, APK, AOSP integration, device test or flashable image is claimed until those results are observed.
+
 ## Current status
-**Specification only.** No Setup Wizard application, platform integration, data-transfer implementation or installable GiggleOS image has been built yet.
+**Specification and application-level source prototype.** The AOSP system integration, cross-device data-transfer service, APK build, device testing and installable GiggleOS image are not yet complete.
