@@ -199,6 +199,15 @@ class HomeActivity : Activity() {
         })
         appsHeader.setOnClickListener { startActivity(Intent(this, AppDrawerActivity::class.java)) }
         content.addView(appsHeader)
+        content.addView(TextView(this).apply {
+            text = "Открыть магазин приложений  ↗"
+            textSize = 12f
+            setTextColor(colors.accent)
+            setPadding(dp(2), 0, 0, dp(12))
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { startActivity(Intent(this@HomeActivity, GiggleStoreActivity::class.java)) }
+        })
 
         val apps = listOf(
             App("Телефон", "phone", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
