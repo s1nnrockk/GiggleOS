@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "device": {
+    "manufacturer": "Xiaomi",
+    "marketing_name": "Redmi Note 8 Pro",
+    "codename": "begonia",
+    "soc": "MediaTek Helio G90T",
+    "platform": "MT6785",
+    "gpu": "Mali-G76 MC4",
+    "architecture": "arm64",
+    "ram_gb": null,
+    "model_numbers": []
+  },
+  "giggleos": {
+    "first_target": true,
+    "support_status": "research",
+    "build_status": "not_built",
+    "hardware_test_status": "not_tested",
+    "android_base": null
+  },
+  "compatibility": {
+    "android_apk_support_goal": true,
+    "tested": false,
+    "notes": "Compatibility is a project goal, not a verified result. Exact model number, RAM variant, firmware and upstream source revisions are still unknown."
+  }
+}
