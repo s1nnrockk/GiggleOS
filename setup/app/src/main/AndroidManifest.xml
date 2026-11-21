@@ -5,6 +5,9 @@
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
         android:supportsRtl="true">
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".HomeActivity"
             android:exported="true">
             <intent-filter>
