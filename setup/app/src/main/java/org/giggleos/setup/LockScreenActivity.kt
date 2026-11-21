@@ -193,6 +193,47 @@ class LockScreenActivity : Activity() {
         }
         content.addView(privacyLabel)
 
+        if (privacy != "Не показывать") {
+            val recent = GiggleNotifications.entries(this).take(2)
+            if (recent.isNotEmpty() || GiggleNotifications.hasAccess(this)) {
+                val notificationCard = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    background = GradientDrawable().apply {
+                        setColor(Color.argb(48, 255, 255, 255))
+                        cornerRadius = dp(18).toFloat()
+                    }
+                    setPadding(dp(15), dp(11), dp(15), dp(11))
+                }
+                if (recent.isEmpty()) {
+                    notificationCard.addView(TextView(this).apply {
+                        text = "Новых уведомлений нет"
+                        textSize = 12f
+                        gravity = Gravity.CENTER
+                        setTextColor(ink)
+                    })
+                } else {
+                    recent.forEach { item ->
+                        notificationCard.addView(TextView(this).apply {
+                            text = "${item.label} · ${java.text.SimpleDateFormat("HH:mm", Locale.getDefault()).format(java.util.Date(item.postedAt))}"
+                            textSize = 13f
+                            setTextColor(ink)
+                            maxLines = 1
+                            setPadding(0, dp(3), 0, dp(3))
+                        })
+                    }
+                    notificationCard.addView(TextView(this).apply {
+                        text = "Содержимое сообщений скрыто"
+                        textSize = 10f
+                        setTextColor(muted)
+                        setPadding(0, dp(4), 0, 0)
+                    })
+                }
+                content.addView(notificationCard, LinearLayout.LayoutParams(-1, -2).apply {
+                    topMargin = dp(18)
+                })
+            }
+        }
+
         content.addView(space(0, 1f))
 
         securityStatus = TextView(this).apply {
