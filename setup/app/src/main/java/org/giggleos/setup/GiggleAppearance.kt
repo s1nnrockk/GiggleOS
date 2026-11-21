@@ -3,6 +3,7 @@ package org.giggleos.setup
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
+import android.net.Uri
 
 /** Shared, persistent GiggleOS appearance settings for prototype activities. */
 object GiggleAppearance {
@@ -21,6 +22,7 @@ object GiggleAppearance {
     private const val MODE = "mode"
     private const val PALETTE = "palette"
     private const val WALLPAPER = "wallpaper"
+    private const val CUSTOM_WALLPAPER = "custom_wallpaper_uri"
 
     fun mode(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(MODE, "system") ?: "system"
@@ -31,6 +33,22 @@ object GiggleAppearance {
 
     fun wallpaper(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(WALLPAPER, "coast") ?: "coast"
+
+    fun customWallpaperUri(context: Context): Uri? =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(CUSTOM_WALLPAPER, null)
+            ?.takeIf { it.isNotBlank() }?.let(Uri::parse)
+
+    fun saveCustomWallpaper(context: Context, uri: Uri) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putString(CUSTOM_WALLPAPER, uri.toString())
+            .apply()
+    }
+
+    fun clearCustomWallpaper(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .remove(CUSTOM_WALLPAPER)
+            .apply()
+    }
 
     fun saveWallpaper(context: Context, wallpaper: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
