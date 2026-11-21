@@ -6,12 +6,15 @@ if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
 if (-not (Get-Command cargo-ndk -ErrorAction SilentlyContinue)) {
     throw "cargo-ndk is missing. Run: cargo install cargo-ndk"
 }
+if (-not $env:ANDROID_NDK_HOME -and -not $env:ANDROID_NDK_ROOT) {
+    throw "Set ANDROID_NDK_HOME to your installed Android NDK directory."
+}
 
 rustup target add aarch64-linux-android
-cargo ndk -t arm64-v8a build --release
+cargo ndk -t arm64-v8a -o ../app/src/main/jniLibs build --release
 
-$source = Join-Path $PSScriptRoot "target/aarch64-linux-android/release/libgiggle_setup_core.so"
-$destination = Join-Path $PSScriptRoot "../app/src/main/jniLibs/arm64-v8a"
-New-Item -ItemType Directory -Force -Path $destination | Out-Null
-Copy-Item $source (Join-Path $destination "libgiggle_setup_core.so") -Force
-Write-Host "Rust core built for arm64-v8a and copied into Android app."
+$library = Join-Path $PSScriptRoot "../app/src/main/jniLibs/arm64-v8a/libgiggle_setup_core.so"
+if (-not (Test-Path $library)) {
+    throw "Rust JNI library was not produced: $library"
+}
+Write-Host "Rust JNI library built and packaged for arm64-v8a."
