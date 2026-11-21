@@ -30,6 +30,7 @@ class LockScreenActivity : Activity() {
     private val muted = Color.rgb(190, 207, 218)
     private val accent = Color.rgb(159, 211, 225)
     private val requestCredential = 4107
+    private lateinit var securityStatusLabel: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,9 +72,13 @@ class LockScreenActivity : Activity() {
         val spacerTop = View(this)
         root.addView(spacerTop, LinearLayout.LayoutParams(1, 0, 1f))
 
+        val preferences = getSharedPreferences("giggle_setup", MODE_PRIVATE)
+        val clockStyle = preferences.getString("clock_style", "Минималистичные часы")
+        val notificationPrivacy = preferences.getString("notification_privacy", "Скрывать личные данные")
+
         val time = TextView(this).apply {
             text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-            textSize = 76f
+            textSize = if (clockStyle == "Крупные часы") 82f else 66f
             letterSpacing = -.045f
             gravity = Gravity.CENTER
             setTextColor(ink)
@@ -92,14 +97,28 @@ class LockScreenActivity : Activity() {
             topMargin = dp(8)
         })
 
-        val status = TextView(this).apply {
-            text = "Ваше пространство. Под вашей защитой."
-            textSize = 14f
+        val privacyLine = TextView(this).apply {
+            text = when (notificationPrivacy) {
+                "Не показывать" -> "Уведомления скрыты"
+                "Показывать содержимое" -> "Предпросмотр уведомлений включён"
+                else -> "Содержимое уведомлений скрыто"
+            }
+            textSize = 13f
             gravity = Gravity.CENTER
             setTextColor(muted)
         }
-        root.addView(status, LinearLayout.LayoutParams(-1, -2).apply {
-            topMargin = dp(36)
+        root.addView(privacyLine, LinearLayout.LayoutParams(-1, -2).apply {
+            topMargin = dp(28)
+        })
+
+        securityStatusLabel = TextView(this).apply {
+            textSize = 14f
+            gravity = Gravity.CENTER
+            setTextColor(accent)
+            setPadding(0, dp(10), 0, 0)
+        }
+        root.addView(securityStatusLabel, LinearLayout.LayoutParams(-1, -2).apply {
+            topMargin = dp(8)
         })
 
         val spacerBottom = View(this)
@@ -145,12 +164,10 @@ class LockScreenActivity : Activity() {
 
     private fun refreshSecurityStatus() {
         val manager = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
-        if (!manager.isDeviceSecure) {
-            Toast.makeText(
-                this,
-                "На устройстве пока не настроен PIN-код, пароль или графический ключ.",
-                Toast.LENGTH_LONG
-            ).show()
+        securityStatusLabel.text = if (manager.isDeviceSecure) {
+            "Системная защита устройства активна"
+        } else {
+            "Настройте PIN-код или пароль для защиты"
         }
     }
 
