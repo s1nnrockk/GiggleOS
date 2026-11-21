@@ -13,7 +13,7 @@
 | Device / vendor | Kernel, HAL, firmware interfaces, device-specific configuration | Audited components for one exact device |
 | Android platform | Framework APIs, ART, package manager, permissions, services | AOSP baseline selected after device compatibility audit |
 | Giggle Setup | First-run flow, setup state, migration entry points, initial preferences | Dedicated platform-integrated setup component |
-| Giggle System UI | Home, lock screen, status/navigation surfaces, quick settings | Kotlin + Android platform APIs; original design system |
+| Giggle System UI | Home, lock screen, status/navigation surfaces, quick settings | Kotlin prototype now; AOSP SystemUI integration later |
 | Giggle Services | Cross-app settings, device capabilities, update coordination | Small, separately testable platform services |
 | First-party apps | Settings, Files, Phone, Messages, Camera, Gallery, Clock, Calculator | Independent Android app modules |
 | Compatibility | Install and run standard Android APKs | Preserve platform package/runtime behavior; test API and ABI coverage |
@@ -25,12 +25,13 @@ The wizard requests actual platform settings through Android system APIs. It mus
 
 Data migration is a separate permission-scoped component. It must not collect account passwords, promise universal app-data transfer, or modify the source device. See [SETUP_WIZARD.md](SETUP_WIZARD.md).
 
-## Setup implementation status
+## Setup and System UI implementation status
 
 The application-level prototype is in [setup/](../setup/). Its UI is implemented with native Android views, while a small Rust library provides state-transition bounds, transfer-category validation and SHA-256 integrity primitives through JNI. Rust is not used to replace Android framework services.
 
-The prototype opens Android settings for protected operations. Production integration still requires a privileged AOSP setup component, verified platform APIs and device-specific capability checks. The migration UI is a foundation only; a secure cross-device transport/receiver remains future work.
+The lock-screen preview delegates credential confirmation to Android Keyguard and does not store credentials. The System UI preview exposes quick-setting entry points to actual Android Settings pages and an explicit empty notification state. Neither preview is a privileged AOSP component. See [LOCK_SCREEN_SECURITY.md](LOCK_SCREEN_SECURITY.md) and [SYSTEM_UI.md](SYSTEM_UI.md).
 
+Production integration still requires a privileged AOSP setup component, the AOSP SystemUI process, verified platform APIs and device-specific capability checks. The migration UI is a foundation only; a secure cross-device transport/receiver remains future work.
 
 ## Application compatibility policy
 GiggleOS will not claim that every Android app works. Compatibility depends on AOSP release, API level, ABI support, Google-dependent services, DRM, device integrations and app-specific restrictions.
@@ -64,7 +65,7 @@ Baseline goals:
 - Do not embed device-specific assumptions in shared apps.
 - Every device profile must identify codename and validation status.
 - Keep secrets, signing keys and private credentials out of the repository.
-- CI validates metadata and structure only; it does not build AOSP or produce flashable images.
+- CI validates metadata and prototypes only; it does not build AOSP or produce flashable images.
 
 ## Current non-goals
 - No universal firmware image.
