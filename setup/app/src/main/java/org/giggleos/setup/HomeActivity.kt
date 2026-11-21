@@ -4,13 +4,16 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextClock
@@ -25,8 +28,6 @@ class HomeActivity : Activity() {
     private val ink = Color.rgb(27, 43, 56)
     private val muted = Color.rgb(101, 119, 132)
     private val paper = Color.rgb(238, 244, 246)
-    private val white = Color.WHITE
-    private val accent = Color.rgb(42, 113, 135)
     private val deep = Color.rgb(22, 56, 75)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,18 +141,18 @@ class HomeActivity : Activity() {
         })
 
         val apps = listOf(
-            App("Телефон", "☎", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
-            App("Сообщения", "▤", Color.rgb(65, 139, 190), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_MESSAGING")),
-            App("Камера", "◉", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
-            App("Фото", "▧", Color.rgb(198, 113, 93), Intent(Intent.ACTION_VIEW).setType("image/*")),
-            App("Браузер", "◎", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))),
-            App("Настройки", "⚙", Color.rgb(104, 119, 132), Intent(Settings.ACTION_SETTINGS)),
-            App("Календарь", "▦", Color.rgb(190, 88, 82), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_CALENDAR")),
-            App("Часы", "◷", Color.rgb(65, 111, 145), Intent("android.intent.action.SHOW_ALARMS")),
-            App("Файлы", "▱", Color.rgb(187, 145, 68), Intent(Intent.ACTION_GET_CONTENT).setType("*/*")),
-            App("Контакты", "♙", Color.rgb(76, 143, 128), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_CONTACTS")),
-            App("Музыка", "♫", Color.rgb(158, 99, 142), Intent(Intent.ACTION_VIEW).setType("audio/*")),
-            App("System UI", "⌘", deep, null)
+            App("Телефон", "phone", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
+            App("Сообщения", "message", Color.rgb(65, 139, 190), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_MESSAGING")),
+            App("Камера", "camera", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
+            App("Фото", "photos", Color.rgb(198, 113, 93), Intent(Intent.ACTION_VIEW).setType("image/*")),
+            App("Браузер", "browser", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://www.google.com"))),
+            App("Настройки", "settings", Color.rgb(104, 119, 132), Intent(Settings.ACTION_SETTINGS)),
+            App("Календарь", "calendar", Color.rgb(190, 88, 82), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_CALENDAR")),
+            App("Часы", "clock", Color.rgb(65, 111, 145), Intent("android.intent.action.SHOW_ALARMS")),
+            App("Файлы", "files", Color.rgb(187, 145, 68), Intent(Intent.ACTION_GET_CONTENT).setType("*/*")),
+            App("Контакты", "contacts", Color.rgb(76, 143, 128), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_CONTACTS")),
+            App("Музыка", "music", Color.rgb(158, 99, 142), Intent(Intent.ACTION_VIEW).setType("audio/*")),
+            App("System UI", "system", deep, null)
         )
         val rows = apps.chunked(4)
         rows.forEach { rowApps ->
@@ -179,10 +180,10 @@ class HomeActivity : Activity() {
             elevation = dp(5).toFloat()
         }
         listOf(
-            App("Телефон", "☎", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
-            App("Браузер", "◎", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))),
-            App("Камера", "◉", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
-            App("Настройки", "⚙", Color.rgb(104, 119, 132), Intent(Settings.ACTION_SETTINGS))
+            App("Телефон", "phone", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
+            App("Браузер", "browser", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))),
+            App("Камера", "camera", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
+            App("Настройки", "settings", Color.rgb(104, 119, 132), Intent(Settings.ACTION_SETTINGS))
         ).forEach { app ->
             dock.addView(appTile(app, compact = true), LinearLayout.LayoutParams(0, dp(62), 1f))
         }
@@ -202,7 +203,7 @@ class HomeActivity : Activity() {
         }
     }
 
-    private data class App(val title: String, val glyph: String, val color: Int, val intent: Intent?)
+    private data class App(val title: String, val iconKey: String, val color: Int, val intent: Intent?)
 
     private fun appTile(app: App, compact: Boolean = false): View {
         val tile = LinearLayout(this).apply {
@@ -211,11 +212,7 @@ class HomeActivity : Activity() {
             isClickable = true
             isFocusable = true
             setPadding(dp(3), dp(2), dp(3), dp(2))
-            val icon = TextView(this@HomeActivity).apply {
-                text = app.glyph
-                textSize = if (compact) 23f else 25f
-                gravity = Gravity.CENTER
-                setTextColor(Color.WHITE)
+            val icon = IconGlyphView(this@HomeActivity, app.iconKey).apply {
                 background = rounded(app.color, 19)
                 elevation = dp(2).toFloat()
             }
@@ -311,6 +308,128 @@ class HomeActivity : Activity() {
         val level = intent?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
         val scale = intent?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1) ?: -1
         return if (level >= 0 && scale > 0) "▰ ${level * 100 / scale}%" else "GIGGLEOS"
+    }
+
+
+    private class IconGlyphView(context: android.content.Context, private val key: String) : View(context) {
+        private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.WHITE
+            style = Paint.Style.STROKE
+            strokeWidth = 2.6f
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+        }
+        private val path = Path()
+        private val rect = RectF()
+
+        override fun onDraw(canvas: Canvas) {
+            super.onDraw(canvas)
+            val scale = minOf(width, height) / 56f
+            canvas.save()
+            canvas.translate(width / 2f, height / 2f)
+            canvas.scale(scale, scale)
+            when (key) {
+                "phone" -> {
+                    path.reset()
+                    path.moveTo(-13f, -17f)
+                    path.cubicTo(-17f, -15f, -15f, -7f, -8f, 2f)
+                    path.cubicTo(-2f, 10f, 8f, 16f, 14f, 13f)
+                    path.lineTo(19f, 7f)
+                    path.lineTo(10f, 0f)
+                    path.lineTo(5f, 5f)
+                    path.cubicTo(0f, 3f, -4f, -1f, -6f, -7f)
+                    path.lineTo(-1f, -12f)
+                    path.lineTo(-8f, -20f)
+                    path.close()
+                    canvas.drawPath(path, paint)
+                }
+                "message" -> {
+                    rect.set(-19f, -15f, 19f, 12f)
+                    canvas.drawRoundRect(rect, 7f, 7f, paint)
+                    path.reset(); path.moveTo(-9f, 12f); path.lineTo(-14f, 19f); path.lineTo(-13f, 11f)
+                    canvas.drawPath(path, paint)
+                    canvas.drawLine(-10f, -4f, 10f, -4f, paint)
+                    canvas.drawLine(-10f, 3f, 5f, 3f, paint)
+                }
+                "camera" -> {
+                    rect.set(-19f, -12f, 19f, 16f)
+                    canvas.drawRoundRect(rect, 5f, 5f, paint)
+                    path.reset(); path.moveTo(-10f, -12f); path.lineTo(-6f, -18f); path.lineTo(7f, -18f); path.lineTo(11f, -12f)
+                    canvas.drawPath(path, paint)
+                    canvas.drawCircle(0f, 2f, 8f, paint)
+                    canvas.drawCircle(13f, -6f, 1.5f, paint)
+                }
+                "photos" -> {
+                    canvas.drawCircle(0f, -11f, 7f, paint)
+                    canvas.drawCircle(11f, 0f, 7f, paint)
+                    canvas.drawCircle(0f, 11f, 7f, paint)
+                    canvas.drawCircle(-11f, 0f, 7f, paint)
+                    canvas.drawCircle(0f, 0f, 3f, paint)
+                }
+                "browser" -> {
+                    canvas.drawCircle(0f, 0f, 19f, paint)
+                    rect.set(-9f, -19f, 9f, 19f); canvas.drawOval(rect, paint)
+                    path.reset(); path.moveTo(-17f, -7f); path.quadTo(0f, -13f, 17f, -7f)
+                    path.moveTo(-17f, 7f); path.quadTo(0f, 13f, 17f, 7f)
+                    canvas.drawPath(path, paint)
+                }
+                "settings" -> {
+                    canvas.drawCircle(0f, 0f, 7f, paint)
+                    for (i in 0 until 8) {
+                        val angle = Math.toRadians(i * 45.0)
+                        val x1 = kotlin.math.cos(angle).toFloat() * 12f
+                        val y1 = kotlin.math.sin(angle).toFloat() * 12f
+                        val x2 = kotlin.math.cos(angle).toFloat() * 19f
+                        val y2 = kotlin.math.sin(angle).toFloat() * 19f
+                        canvas.drawLine(x1, y1, x2, y2, paint)
+                    }
+                    canvas.drawCircle(0f, 0f, 3f, paint)
+                }
+                "calendar" -> {
+                    rect.set(-17f, -16f, 17f, 18f); canvas.drawRoundRect(rect, 4f, 4f, paint)
+                    canvas.drawLine(-17f, -6f, 17f, -6f, paint)
+                    canvas.drawLine(-9f, -21f, -9f, -11f, paint)
+                    canvas.drawLine(9f, -21f, 9f, -11f, paint)
+                    canvas.drawLine(-8f, 2f, -8f, 2f, paint)
+                    canvas.drawCircle(-7f, 3f, 1f, paint); canvas.drawCircle(2f, 3f, 1f, paint)
+                    canvas.drawCircle(10f, 3f, 1f, paint); canvas.drawCircle(-7f, 11f, 1f, paint)
+                    canvas.drawCircle(2f, 11f, 1f, paint); canvas.drawCircle(10f, 11f, 1f, paint)
+                }
+                "clock" -> {
+                    canvas.drawCircle(0f, 0f, 19f, paint)
+                    canvas.drawLine(0f, 0f, 0f, -12f, paint)
+                    canvas.drawLine(0f, 0f, 10f, 6f, paint)
+                    canvas.drawCircle(0f, 0f, 1.5f, paint)
+                }
+                "files" -> {
+                    path.reset(); path.moveTo(-19f, -13f); path.lineTo(-3f, -13f); path.lineTo(2f, -7f)
+                    path.lineTo(19f, -7f); path.lineTo(16f, 17f); path.lineTo(-17f, 17f); path.close()
+                    canvas.drawPath(path, paint)
+                    canvas.drawLine(-18f, -5f, 18f, -5f, paint)
+                }
+                "contacts" -> {
+                    canvas.drawCircle(0f, -9f, 7f, paint)
+                    path.reset(); path.moveTo(-17f, 17f); path.cubicTo(-16f, 2f, 16f, 2f, 17f, 17f)
+                    canvas.drawPath(path, paint)
+                }
+                "music" -> {
+                    path.reset(); path.moveTo(4f, -18f); path.lineTo(4f, 10f)
+                    path.moveTo(4f, -17f); path.lineTo(17f, -20f); path.lineTo(17f, 7f)
+                    canvas.drawPath(path, paint)
+                    canvas.drawCircle(-3f, 12f, 7f, paint)
+                    canvas.drawCircle(10f, 9f, 7f, paint)
+                }
+                else -> {
+                    canvas.drawLine(-17f, -12f, 17f, -12f, paint)
+                    canvas.drawLine(-17f, 0f, 17f, 0f, paint)
+                    canvas.drawLine(-17f, 12f, 17f, 12f, paint)
+                    canvas.drawCircle(-7f, -12f, 3f, paint)
+                    canvas.drawCircle(9f, 0f, 3f, paint)
+                    canvas.drawCircle(-1f, 12f, 3f, paint)
+                }
+            }
+            canvas.restore()
+        }
     }
 
     private fun rounded(color: Int, radius: Int) = GradientDrawable().apply {
