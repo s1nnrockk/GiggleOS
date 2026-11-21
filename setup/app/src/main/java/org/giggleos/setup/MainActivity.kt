@@ -61,7 +61,9 @@ class MainActivity : Activity() {
 
         val prefs = getSharedPreferences("giggle_setup", MODE_PRIVATE)
         if (prefs.getBoolean("setup_complete", false)) {
-            step = 11
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+            return
         } else {
             step = savedInstanceState?.getInt("step")
                 ?: prefs.getInt("current_step", 0).coerceIn(0, 11)
@@ -343,7 +345,7 @@ class MainActivity : Activity() {
                 body.addView(note("Готово", "Все шаги настройки пройдены. Можно перейти к предпросмотру интерфейса GiggleOS."))
                 body.addView(space(12))
                 body.addView(actionButton("Открыть главный экран", true) {
-                    startActivity(Intent(this, HomeActivity::class.java))
+                    completeSetupAndOpenHome()
                 })
                 body.addView(space(8))
                 body.addView(actionButton("Предпросмотр System UI", false) {
@@ -529,12 +531,20 @@ class MainActivity : Activity() {
         } else if (step < 11) {
             step = try { nativeNextStep(step) } catch (_: UnsatisfiedLinkError) { (step + 1).coerceAtMost(11) }
         } else {
-            getSharedPreferences("giggle_setup", MODE_PRIVATE).edit()
-                .putBoolean("setup_complete", true).apply()
-            Toast.makeText(this, "Настройка завершена.", Toast.LENGTH_SHORT).show()
+            completeSetupAndOpenHome()
+            return
         }
         persist()
         render()
+    }
+
+    private fun completeSetupAndOpenHome() {
+        getSharedPreferences("giggle_setup", MODE_PRIVATE).edit()
+            .putBoolean("setup_complete", true)
+            .putInt("current_step", 11)
+            .apply()
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
     }
 
     private fun goBack() {
