@@ -22,7 +22,7 @@ The UI uses Android platform widgets and a custom GiggleOS visual layer. It does
 
 ## Modules
 
-- `app/`: Android UI, progress persistence and platform settings entry points.
+- `app/`: Android setup UI, lock-screen preview, platform credential confirmation, progress persistence and system-settings entry points.
 - `native/`: Rust navigation validation, transfer-category bitmask validation and SHA-256 integrity primitive.
 - `docs/SETUP_WIZARD.md`: product behavior, data-transfer boundaries and AOSP integration contract.
 
@@ -49,6 +49,7 @@ The Kotlin activity has a fallback for environments where the Rust shared librar
 - Step navigation and progress persistence are implemented.
 - Language, region, appearance, navigation and lock-screen preview choices are stored by the prototype.
 - Wi-Fi, date/time, security, biometric and accessibility actions open Android system settings. They do not bypass platform permission checks.
+- The lock-screen preview uses Android's trusted credential confirmation UI; it never collects or stores a PIN/password. It is not yet the real system lock screen. See [LOCK_SCREEN_SECURITY](../docs/LOCK_SCREEN_SECURITY.md).
 - Data-source and category selection are implemented, but the cross-device transport, pairing protocol and receiver are not implemented.
 - Selected appearance and lock-screen preferences are not yet applied to the real System UI.
 - The activity is not yet registered as the privileged first-boot Setup Wizard in AOSP.
