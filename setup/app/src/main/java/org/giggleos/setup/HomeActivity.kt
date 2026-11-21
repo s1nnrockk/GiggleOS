@@ -333,17 +333,49 @@ class HomeActivity : Activity() {
             panel.addView(row)
             panel.addView(space(8))
         }
-        panel.addView(TextView(this).apply {
-            text = "Уведомления\n\nНовых уведомлений нет"
-            textSize = 14f
-            gravity = Gravity.CENTER
-            setTextColor(muted)
-            background = rounded(Color.WHITE, 18)
-            setPadding(dp(12), dp(22), dp(12), dp(22))
-        })
+        val notifications = GiggleNotifications.entries(this)
+        if (notifications.isEmpty()) {
+            panel.addView(TextView(this).apply {
+                text = if (GiggleNotifications.hasAccess(this@HomeActivity))
+                    "Всё спокойно\\nНовых уведомлений нет"
+                else
+                    "Центр уведомлений выключен\\nРазрешите доступ, чтобы видеть уведомления приложений"
+                textSize = 14f
+                gravity = Gravity.CENTER
+                setTextColor(muted)
+                background = rounded(colors.surface, 18)
+                setPadding(dp(12), dp(22), dp(12), dp(22))
+            })
+        } else {
+            panel.addView(TextView(this).apply {
+                text = "Последние уведомления"
+                textSize = 14f
+                setTextColor(ink)
+                typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+                setPadding(0, 0, 0, dp(9))
+            })
+            notifications.forEach { item ->
+                panel.addView(TextView(this).apply {
+                    text = "${item.label}  ·  ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(item.postedAt))}\\nНовое уведомление · содержимое скрыто"
+                    textSize = 12f
+                    setTextColor(ink)
+                    background = rounded(colors.surface, 16)
+                    setPadding(dp(14), dp(12), dp(14), dp(12))
+                })
+                panel.addView(space(6))
+            }
+        }
         AlertDialog.Builder(this)
             .setView(panel)
             .setNegativeButton("Закрыть", null)
+            .setPositiveButton(if (GiggleNotifications.hasAccess(this)) "Очистить список" else "Включить доступ") { _, _ ->
+                if (GiggleNotifications.hasAccess(this)) {
+                    GiggleNotifications.clear(this)
+                    showControlCenter()
+                } else {
+                    launch(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                }
+            }
             .setNeutralButton("Все настройки") { _, _ -> launch(Intent(this, SettingsActivity::class.java)) }
             .show()
     }
