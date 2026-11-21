@@ -185,7 +185,7 @@ class MainActivity : Activity() {
             }
             1 -> {
                 hero(body, "Ваш язык.", "Выберите язык интерфейса GiggleOS.")
-                choiceList(body, listOf("Русский", "English", "Deutsch", "Español", "Français"), localeChoice) {
+                body.addView(choiceList(body, listOf("Русский", "English", "Deutsch", "Español", "Français"), localeChoice) {
                     localeChoice = it; persist(); render()
                 }
                 body.addView(note("Примечание", "В этом прототипе выбор сохраняется внутри мастера. Глобальная смена языка будет подключена при интеграции в AOSP."))
@@ -219,7 +219,7 @@ class MainActivity : Activity() {
             }
             5 -> {
                 hero(body, "Перенести данные?", "Выберите, откуда вы переходите. Старое устройство останется без изменений.")
-                choiceList(body, listOf("Настроить как новое устройство", "Перенести с Android", "Импортировать с iPhone"), when(sourceChoice) {
+                body.addView(choiceList(body, listOf("Настроить как новое устройство", "Перенести с Android", "Импортировать с iPhone"), when(sourceChoice) {
                     "android" -> "Перенести с Android"
                     "iphone" -> "Импортировать с iPhone"
                     else -> "Настроить как новое устройство"
@@ -358,9 +358,9 @@ class MainActivity : Activity() {
             wrap.addView(row)
             if (choice != choices.last()) wrap.addView(divider())
         }
-        parent.addView(wrap, LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+        wrap.layoutParams = LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
             bottomMargin = dp(14)
-        })
+        }
         return wrap
     }
 
