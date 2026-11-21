@@ -81,9 +81,18 @@ class AppDrawerActivity : Activity() {
             typeface = Typeface.create("sans-serif", Typeface.NORMAL)
         }, LinearLayout.LayoutParams(0, dp(48), 1f))
         header.addView(TextView(this).apply {
+            text = "Магазин"
+            textSize = 12f
+            setTextColor(colors.accent)
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { startActivity(Intent(this@AppDrawerActivity, GiggleStoreActivity::class.java)) }
+        })
+        header.addView(TextView(this).apply {
             text = "${apps.size} установлено"
             textSize = 11f
             setTextColor(muted)
+            setPadding(dp(10), 0, 0, 0)
         })
         root.addView(header)
 
