@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: setup-module-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   rust-core:
     name: Rust core tests
