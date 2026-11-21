@@ -187,14 +187,14 @@ class MainActivity : Activity() {
                 hero(body, "Ваш язык.", "Выберите язык интерфейса GiggleOS.")
                 body.addView(choiceList(body, listOf("Русский", "English", "Deutsch", "Español", "Français"), localeChoice) {
                     localeChoice = it; persist(); render()
-                }
+                })
                 body.addView(note("Примечание", "В этом прототипе выбор сохраняется внутри мастера. Глобальная смена языка будет подключена при интеграции в AOSP."))
             }
             2 -> {
                 hero(body, "Регион и время.", "Используем региональные форматы даты, времени и чисел.")
-                choiceList(body, listOf("Автоматически", "Нидерланды", "Россия", "Германия", "США"), regionChoice) {
+                body.addView(choiceList(body, listOf("Автоматически", "Нидерланды", "Россия", "Германия", "США"), regionChoice) {
                     regionChoice = it; persist(); render()
-                }
+                })
                 body.addView(actionButton("Открыть настройки даты и времени", false) {
                     openSettings(Intent(Settings.ACTION_DATE_SETTINGS))
                 })
@@ -230,7 +230,7 @@ class MainActivity : Activity() {
                         else -> "new"
                     }
                     persist(); render()
-                }
+                })
                 if (sourceChoice != "new") {
                     body.addView(space(10))
                     body.addView(note("Выбор данных", "В будущем здесь появится защищённое соединение между устройствами. Сейчас реальный приём и копирование данных ещё не реализованы."))
@@ -480,12 +480,12 @@ class MainActivity : Activity() {
         }
         if (step == 10) {
             step = 11
-            getSharedPreferences("giggle_setup", MODE_PRIVATE).edit()
-                .putBoolean("setup_complete", true).apply()
         } else if (step < 11) {
             step = try { nativeNextStep(step) } catch (_: UnsatisfiedLinkError) { (step + 1).coerceAtMost(11) }
         } else {
-            Toast.makeText(this, "Демонстрационный Setup Wizard завершён.", Toast.LENGTH_SHORT).show()
+            getSharedPreferences("giggle_setup", MODE_PRIVATE).edit()
+                .putBoolean("setup_complete", true).apply()
+            Toast.makeText(this, "Настройка завершена.", Toast.LENGTH_SHORT).show()
         }
         persist()
         render()
