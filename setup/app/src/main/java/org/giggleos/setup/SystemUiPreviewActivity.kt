@@ -19,7 +19,7 @@ import android.widget.Toast
 
 /** App-level System UI preview. AOSP SystemUI remains the authority for real system surfaces. */
 class SystemUiPreviewActivity : Activity() {
-    private val background = Color.rgb(13, 28, 42)
+    private val backgroundColor = Color.rgb(13, 28, 42)
     private val surface = Color.rgb(28, 48, 64)
     private val raised = Color.rgb(37, 62, 78)
     private val ink = Color.rgb(244, 248, 250)
@@ -29,15 +29,15 @@ class SystemUiPreviewActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        window.statusBarColor = background
-        window.navigationBarColor = background
+        window.statusBarColor = backgroundColor
+        window.navigationBarColor = backgroundColor
         render()
     }
 
     private fun render() {
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundColor(background)
+            setBackgroundColor(backgroundColor)
             setPadding(dp(22), dp(18), dp(22), dp(24))
         }
         val header = LinearLayout(this).apply {
@@ -106,7 +106,7 @@ class SystemUiPreviewActivity : Activity() {
         })
         body.addView(space(8))
         body.addView(actionRow("Настройки уведомлений", "Каналы и разрешения") {
-            openSettings(Settings.ACTION_NOTIFICATION_SETTINGS)
+            openSettings(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
         })
         body.addView(space(8))
         body.addView(actionRow("Все настройки", "Открыть настройки Android") {
