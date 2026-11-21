@@ -74,6 +74,10 @@ class MainActivity : Activity() {
         clockStyle = prefs.getString("clock_style", clockStyle) ?: clockStyle
         lockChoice = prefs.getString("lock", lockChoice) ?: lockChoice
         transferFlags = prefs.getInt("transfer_flags", 0)
+        window.statusBarColor = paper
+        window.navigationBarColor = paper
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
         render()
     }
 
@@ -179,6 +183,14 @@ class MainActivity : Activity() {
             root.addView(skip, LinearLayout.LayoutParams(-1, dp(38)))
         }
         setContentView(root)
+        val animationsEnabled = try {
+            Settings.Global.getFloat(contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
+        } catch (_: Exception) { true }
+        if (animationsEnabled) {
+            root.alpha = 0f
+            root.translationY = dp(8).toFloat()
+            root.animate().alpha(1f).translationY(0f).setDuration(240L).start()
+        }
     }
 
     private fun buildPage(body: LinearLayout) {
@@ -294,7 +306,15 @@ class MainActivity : Activity() {
                     navigationChoice = it; persist(); render()
                 })
                 body.addView(space(12))
-                body.addView(actionButton("Настройки специальных возможностей", false) {
+                body.addView(actionButton("Настройки уведомлений", false) {
+                    openSettings(Intent(Settings.ACTION_NOTIFICATION_SETTINGS))
+                })
+                body.addView(space(8))
+                body.addView(actionButton("Настройки звука", false) {
+                    openSettings(Intent(Settings.ACTION_SOUND_SETTINGS))
+                })
+                body.addView(space(8))
+                body.addView(actionButton("Специальные возможности", false) {
                     openSettings(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                 })
             }
