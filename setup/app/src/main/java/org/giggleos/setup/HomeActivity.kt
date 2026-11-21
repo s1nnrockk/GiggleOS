@@ -25,18 +25,32 @@ import java.util.Locale
 
 /** Interactive home-screen prototype. Android remains responsible for launching installed apps. */
 class HomeActivity : Activity() {
-    private val ink = Color.rgb(27, 43, 56)
-    private val muted = Color.rgb(101, 119, 132)
-    private val paper = Color.rgb(238, 244, 246)
-    private val deep = Color.rgb(22, 56, 75)
+    private val colors get() = GiggleAppearance.colors(this)
+    private val ink get() = colors.text
+    private val muted get() = colors.muted
+    private val paper get() = colors.background
+    private val deep get() = colors.heroEnd
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = paper
         window.navigationBarColor = paper
-        @Suppress("DEPRECATION")
-        window.decorView.systemUiVisibility =
+        applySystemBarIcons()
+        render()
+    }
+
+
+    @Suppress("DEPRECATION")
+    private fun applySystemBarIcons() {
+        window.decorView.systemUiVisibility = if (colors.dark) 0 else
             View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        window.statusBarColor = paper
+        window.navigationBarColor = paper
+        applySystemBarIcons()
         render()
     }
 
@@ -107,14 +121,14 @@ class HomeActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             background = GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                intArrayOf(Color.rgb(65, 139, 153), Color.rgb(35, 83, 108))
+                intArrayOf(colors.heroStart, colors.heroEnd)
             ).apply { cornerRadius = dp(28).toFloat() }
             setPadding(dp(20), dp(18), dp(20), dp(18))
             addView(TextView(this@HomeActivity).apply {
                 text = "GIGGLEOS"
                 textSize = 10f
                 letterSpacing = .18f
-                setTextColor(Color.rgb(210, 239, 239))
+                setTextColor(Color.rgb(222, 241, 241))
                 typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
             })
             addView(TextView(this@HomeActivity).apply {
@@ -127,7 +141,7 @@ class HomeActivity : Activity() {
             addView(TextView(this@HomeActivity).apply {
                 text = "Ваше пространство. Ваш ритм."
                 textSize = 13f
-                setTextColor(Color.rgb(223, 239, 241))
+                setTextColor(Color.rgb(229, 241, 243))
             })
         }
         content.addView(glance, LinearLayout.LayoutParams(-1, dp(154)))
@@ -146,7 +160,7 @@ class HomeActivity : Activity() {
         appsHeader.addView(TextView(this).apply {
             text = "Все приложения  ›"
             textSize = 12f
-            setTextColor(Color.rgb(42, 113, 135))
+            setTextColor(colors.accent)
             isClickable = true
             isFocusable = true
             setOnClickListener { startActivity(Intent(this@HomeActivity, AppDrawerActivity::class.java)) }
@@ -189,7 +203,7 @@ class HomeActivity : Activity() {
         val dock = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
-            background = rounded(Color.argb(225, 255, 255, 255), 28)
+            background = rounded(if (colors.dark) Color.rgb(31, 47, 59) else Color.argb(235, 255, 255, 255), 28)
             setPadding(dp(8), dp(9), dp(8), dp(9))
             elevation = dp(5).toFloat()
         }
