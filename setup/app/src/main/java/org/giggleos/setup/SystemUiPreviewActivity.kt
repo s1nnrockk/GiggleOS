@@ -19,19 +19,28 @@ import android.widget.Toast
 
 /** App-level System UI preview. AOSP SystemUI remains the authority for real system surfaces. */
 class SystemUiPreviewActivity : Activity() {
-    private val backgroundColor = Color.rgb(13, 28, 42)
-    private val surface = Color.rgb(28, 48, 64)
-    private val raised = Color.rgb(37, 62, 78)
-    private val ink = Color.rgb(244, 248, 250)
-    private val muted = Color.rgb(174, 196, 207)
-    private val accent = Color.rgb(166, 222, 225)
+    private val colors get() = GiggleAppearance.colors(this)
+    private val backgroundColor get() = colors.background
+    private val surface get() = colors.surface
+    private val raised get() = if (colors.dark) Color.rgb(37, 62, 78) else Color.rgb(246, 249, 250)
+    private val ink get() = colors.text
+    private val muted get() = colors.muted
+    private val accent get() = colors.accent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         window.statusBarColor = backgroundColor
         window.navigationBarColor = backgroundColor
+        applySystemBarIcons()
         render()
+    }
+
+
+    @Suppress("DEPRECATION")
+    private fun applySystemBarIcons() {
+        window.decorView.systemUiVisibility = if (colors.dark) 0 else
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
     }
 
     private fun render() {
