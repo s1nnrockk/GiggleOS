@@ -35,8 +35,7 @@ class MainActivity : Activity() {
     private var clockStyle = "Минималистичные часы"
     private var lockChoice = "Настроить позже"
     private var transferFlags = 0
-    private var rustLoaded = false
-
+    
     private external fun nativeNextStep(current: Int): Int
     private external fun nativePreviousStep(current: Int): Int
     private external fun nativeValidateTransferFlags(flags: Int): Boolean
@@ -54,9 +53,11 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rustLoaded = try {
-            nativeSha256("giggleos").length == 64
-        } catch (_: UnsatisfiedLinkError) { false }
+        try {
+            nativeSha256("giggleos")
+        } catch (_: UnsatisfiedLinkError) {
+            // The Kotlin path remains available until the native library is packaged.
+        }
 
         val prefs = getSharedPreferences("giggle_setup", MODE_PRIVATE)
         if (prefs.getBoolean("setup_complete", false)) {
@@ -206,7 +207,7 @@ class MainActivity : Activity() {
                 body.addView(choiceList(body, listOf("Русский", "English", "Deutsch", "Español", "Français"), localeChoice) {
                     localeChoice = it; persist(); render()
                 })
-                body.addView(note("Примечание", "В этом прототипе выбор сохраняется внутри мастера. Глобальная смена языка будет подключена при интеграции в AOSP."))
+                body.addView(note("Примечание", "Выбранный язык используется во время настройки. Системный язык можно будет изменить в настройках."))
             }
             2 -> {
                 hero(body, "Регион и время.", "Используем региональные форматы даты, времени и чисел.")
@@ -251,7 +252,7 @@ class MainActivity : Activity() {
                 })
                 if (sourceChoice != "new") {
                     body.addView(space(10))
-                    body.addView(note("Выбор данных", "В будущем здесь появится защищённое соединение между устройствами. Сейчас реальный приём и копирование данных ещё не реализованы."))
+                    body.addView(note("Выбор данных", "Перенос с выбранного устройства пока недоступен. Вы можете продолжить настройку без переноса."))
                     body.addView(transferCategoryChecks(body))
                 } else {
                     body.addView(note("Чистый старт", "На телефон не будут переноситься данные со старого устройства."))
@@ -292,7 +293,7 @@ class MainActivity : Activity() {
                 body.addView(choiceList(body, listOf("Показывать содержимое", "Скрывать личные данные", "Не показывать"), notificationPrivacy) {
                     notificationPrivacy = it; persist(); render()
                 })
-                body.addView(note("Персонализация", "Выборы сохраняются в мастере. Применение к настоящему экрану блокировки подключается через System UI."))
+                body.addView(note("Персонализация", "Предпросмотр показывает выбранный стиль. Настройки экрана блокировки можно будет открыть отдельно."))
             }
             9 -> {
                 hero(body, "Настройте ощущения.", "Выберите тему и способ навигации.")
@@ -334,9 +335,9 @@ class MainActivity : Activity() {
             }
             11 -> {
                 hero(body, "Всё готово.", "Добро пожаловать в GiggleOS.")
-                body.addView(infoCard("Ваш телефон готов к настройке рабочего стола.", "Это завершает демонстрационный мастер. Для системного первого запуска потребуется интеграция Setup Wizard в сборку AOSP."))
+                body.addView(infoCard("Ваш телефон готов к настройке рабочего стола.", "Первоначальная настройка завершена. Выбранные параметры сохранены."))
                 body.addView(space(14))
-                body.addView(note("Статус", if (rustLoaded) "Rust core подключён." else "Интерфейс работает в режиме Kotlin fallback. Rust core подключается после сборки NDK-библиотеки."))
+                body.addView(note("Готово", "Все шаги настройки пройдены. Можно переходить к использованию телефона."))
             }
         }
     }
