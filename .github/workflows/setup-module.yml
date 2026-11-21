@@ -27,7 +27,7 @@ jobs:
           toolchain: stable
           components: rustfmt
       - run: cargo fmt --all -- --check
-      - run: cargo test --locked
+      - run: cargo test
 
   android-prototype:
     name: Android setup prototype compile
