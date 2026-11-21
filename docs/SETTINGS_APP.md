@@ -7,6 +7,7 @@
 - Sound, notification, security, privacy, battery and accessibility entries.
 - About dialog reports the actual host device and Android version and clearly labels the build as a prototype.
 - Appearance settings persist system/light/dark mode and Ocean/Jade/Coral palette choices.
+- Lock-screen wallpaper picker persists one of four local gradient presets.
 - Protected system controls open Android's own settings activities instead of simulating privileged access.
 
 ## Boundary
