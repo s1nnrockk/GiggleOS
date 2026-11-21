@@ -2,7 +2,7 @@
     <application
         android:allowBackup="false"
         android:label="GiggleOS Setup"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
         android:supportsRtl="true">
         <activity
             android:name=".MainActivity"
