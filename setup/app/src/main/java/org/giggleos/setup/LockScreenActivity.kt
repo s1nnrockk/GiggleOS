@@ -33,7 +33,7 @@ import java.util.Locale
 class LockScreenActivity : Activity() {
     private val ink = Color.rgb(247, 250, 252)
     private val muted = Color.rgb(195, 213, 224)
-    private val accent = Color.rgb(174, 224, 231)
+    private val accent get() = GiggleAppearance.colors(this).accent
     private lateinit var securityStatus: TextView
     private lateinit var batteryStatus: TextView
     private var batteryReceiverRegistered = false
@@ -100,8 +100,8 @@ class LockScreenActivity : Activity() {
             background = GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
                 intArrayOf(
-                    Color.rgb(28, 76, 96),
-                    Color.rgb(25, 57, 78),
+                    GiggleAppearance.colors(this).heroStart,
+                    GiggleAppearance.colors(this).heroEnd,
                     Color.rgb(14, 31, 48)
                 )
             )
