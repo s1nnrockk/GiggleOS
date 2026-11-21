@@ -31,6 +31,8 @@ class MainActivity : Activity() {
     private var sourceChoice = "new"
     private var appearanceChoice = "Авто"
     private var navigationChoice = "Жесты"
+    private var notificationPrivacy = "Скрывать личные данные"
+    private var clockStyle = "Минималистичные часы"
     private var lockChoice = "Настроить позже"
     private var transferFlags = 0
     private var rustLoaded = false
@@ -68,6 +70,8 @@ class MainActivity : Activity() {
         sourceChoice = prefs.getString("source", sourceChoice) ?: sourceChoice
         appearanceChoice = prefs.getString("appearance", appearanceChoice) ?: appearanceChoice
         navigationChoice = prefs.getString("navigation", navigationChoice) ?: navigationChoice
+        notificationPrivacy = prefs.getString("notification_privacy", notificationPrivacy) ?: notificationPrivacy
+        clockStyle = prefs.getString("clock_style", clockStyle) ?: clockStyle
         lockChoice = prefs.getString("lock", lockChoice) ?: lockChoice
         transferFlags = prefs.getInt("transfer_flags", 0)
         render()
@@ -86,6 +90,8 @@ class MainActivity : Activity() {
             .putString("source", sourceChoice)
             .putString("appearance", appearanceChoice)
             .putString("navigation", navigationChoice)
+            .putString("notification_privacy", notificationPrivacy)
+            .putString("clock_style", clockStyle)
             .putString("lock", lockChoice)
             .putInt("transfer_flags", transferFlags)
             .apply()
@@ -266,8 +272,15 @@ class MainActivity : Activity() {
             8 -> {
                 hero(body, "Экран блокировки.", "Выберите настроение и приватность уведомлений.")
                 body.addView(infoCard("Предпросмотр", "10:08\n\nПонедельник, 21 ноября\n\nУведомления будут отображаться здесь"))
-                body.addView(choiceListView("Вид уведомлений", listOf("Показывать содержимое", "Скрывать личные данные", "Не показывать"), "Скрывать личные данные"))
-                body.addView(note("Персонализация", "Этот экран задаёт направление оформления. Реальные часы, обои и уведомления подключаются к System UI."))
+                body.addView(sectionLabel("Стиль часов"))
+                body.addView(choiceList(body, listOf("Минималистичные часы", "Крупные часы"), clockStyle) {
+                    clockStyle = it; persist(); render()
+                })
+                body.addView(sectionLabel("Уведомления на заблокированном экране"))
+                body.addView(choiceList(body, listOf("Показывать содержимое", "Скрывать личные данные", "Не показывать"), notificationPrivacy) {
+                    notificationPrivacy = it; persist(); render()
+                })
+                body.addView(note("Персонализация", "Выборы сохраняются в мастере. Применение к настоящему экрану блокировки подключается через System UI."))
             }
             9 -> {
                 hero(body, "Настройте ощущения.", "Выберите тему и способ навигации.")
@@ -295,6 +308,7 @@ class MainActivity : Activity() {
                     else -> "Настроить как новое устройство"
                 }))
                 body.addView(summaryCard("Блокировка", lockChoice))
+                body.addView(summaryCard("Экран блокировки", "$clockStyle · $notificationPrivacy"))
                 body.addView(summaryCard("Внешний вид", "$appearanceChoice · $navigationChoice"))
                 body.addView(note("Можно изменить позже", "Большинство параметров будут доступны в приложении «Настройки» после завершения интеграции с AOSP."))
             }
