@@ -539,11 +539,17 @@ class MainActivity : Activity() {
     }
 
     private fun completeSetupAndOpenHome() {
+        val selectedMode = when (appearanceChoice) {
+            "Светлая" -> "light"
+            "Тёмная" -> "dark"
+            else -> "system"
+        }
+        GiggleAppearance.save(this, selectedMode, GiggleAppearance.palette(this))
         getSharedPreferences("giggle_setup", MODE_PRIVATE).edit()
             .putBoolean("setup_complete", true)
             .putInt("current_step", 11)
             .apply()
-        startActivity(Intent(this, HomeActivity::class.java))
+        startActivity(Intent(this, HomeActivity::class.java).putExtra(HomeActivity.EXTRA_REQUEST_DEFAULT_HOME, true))
         finish()
     }
 
