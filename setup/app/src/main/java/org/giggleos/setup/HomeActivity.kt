@@ -296,6 +296,7 @@ class HomeActivity : Activity() {
             }
             contentDescription = app.title
         }
+        GiggleMotion.attachPress(tile, this)
         return tile
     }
 
