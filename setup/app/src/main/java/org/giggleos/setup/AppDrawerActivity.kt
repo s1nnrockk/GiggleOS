@@ -149,6 +149,8 @@ class AppDrawerActivity : Activity() {
                     val icon = ImageView(this@AppDrawerActivity).apply {
                         setImageDrawable(app.icon)
                         scaleType = ImageView.ScaleType.FIT_CENTER
+                        background = GiggleIconAppearance.background(this@AppDrawerActivity, app.packageName, colors.surface)
+                        setPadding(dp(5), dp(5), dp(5), dp(5))
                         contentDescription = app.label
                     }
                     addView(icon, LinearLayout.LayoutParams(dp(54), dp(54)))
@@ -162,7 +164,11 @@ class AppDrawerActivity : Activity() {
                         setPadding(0, dp(5), 0, 0)
                     }, LinearLayout.LayoutParams(-1, dp(34)))
                     setOnClickListener { launchApp(app) }
-                    contentDescription = "Открыть ${app.label}"
+                    setOnLongClickListener {
+                        GiggleIconAppearance.showEditor(this@AppDrawerActivity, app.packageName) { renderApps(search.text?.toString().orEmpty()) }
+                        true
+                    }
+                    contentDescription = "Открыть ${app.label}. Удерживайте для настройки оформления."
                 }
                 GiggleMotion.attachPress(tile, this@AppDrawerActivity)
                 row.addView(tile, LinearLayout.LayoutParams(0, dp(98), 1f))
@@ -171,6 +177,15 @@ class AppDrawerActivity : Activity() {
                 row.addView(View(this), LinearLayout.LayoutParams(0, dp(98), 1f))
             }
             list.addView(row)
+        }
+    }
+
+    @Deprecated("Deprecated in Android API")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == GiggleIconAppearance.REQUEST_IMAGE) {
+            GiggleIconAppearance.handleImageResult(this, resultCode, data)
+            renderApps(search.text?.toString().orEmpty())
         }
     }
 
