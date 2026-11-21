@@ -121,7 +121,7 @@ class SettingsActivity : Activity() {
         search = EditText(this).apply {
             hint = "Поиск настроек"
             textSize = 14f
-            singleLine = true
+            setSingleLine(true)
             setTextColor(ink)
             setHintTextColor(muted)
             background = rounded(Color.WHITE, 16)
