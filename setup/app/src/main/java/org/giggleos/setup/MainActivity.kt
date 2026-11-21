@@ -342,7 +342,11 @@ class MainActivity : Activity() {
                 body.addView(space(14))
                 body.addView(note("Готово", "Все шаги настройки пройдены. Можно перейти к предпросмотру интерфейса GiggleOS."))
                 body.addView(space(12))
-                body.addView(actionButton("Открыть System UI", true) {
+                body.addView(actionButton("Открыть главный экран", true) {
+                    startActivity(Intent(this, HomeActivity::class.java))
+                })
+                body.addView(space(8))
+                body.addView(actionButton("Предпросмотр System UI", false) {
                     startActivity(Intent(this, SystemUiPreviewActivity::class.java))
                 })
             }
