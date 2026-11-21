@@ -4,6 +4,7 @@
 - Native Android home screen with a live clock and date.
 - A custom visual identity using a restrained teal/blue palette, layered cards and rounded app tiles.
 - Original vector-drawn line icons for the built-in app grid and dock; no emoji icon placeholders.
+- Home screen reads the saved light/dark mode and accent palette.
 - Dynamic-Island-inspired capsule used as an entry point to the control center.
 - App grid and dock with Android intent hand-off for dialer, messaging, camera, gallery, browser, settings, calendar, clock, files, contacts and audio apps.
 - Control center cards open real Android settings pages; they do not pretend to toggle privileged hardware state.
