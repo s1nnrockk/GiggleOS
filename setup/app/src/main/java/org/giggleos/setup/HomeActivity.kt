@@ -146,7 +146,7 @@ class HomeActivity : Activity() {
             App("Камера", "camera", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
             App("Фото", "photos", Color.rgb(198, 113, 93), Intent(Intent.ACTION_VIEW).setType("image/*")),
             App("Браузер", "browser", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://www.google.com"))),
-            App("Настройки", "settings", Color.rgb(104, 119, 132), Intent(Settings.ACTION_SETTINGS)),
+            App("Настройки", "settings", Color.rgb(104, 119, 132), Intent(this, SettingsActivity::class.java)),
             App("Календарь", "calendar", Color.rgb(190, 88, 82), Intent(Intent.ACTION_MAIN).addCategory("android.intent.category.APP_CALENDAR")),
             App("Часы", "clock", Color.rgb(65, 111, 145), Intent("android.intent.action.SHOW_ALARMS")),
             App("Файлы", "files", Color.rgb(187, 145, 68), Intent(Intent.ACTION_GET_CONTENT).setType("*/*")),
@@ -183,7 +183,7 @@ class HomeActivity : Activity() {
             App("Телефон", "phone", Color.rgb(48, 158, 116), Intent(Intent.ACTION_DIAL)),
             App("Браузер", "browser", Color.rgb(55, 126, 159), Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com"))),
             App("Камера", "camera", Color.rgb(70, 83, 96), Intent("android.media.action.IMAGE_CAPTURE")),
-            App("Настройки", "settings", Color.rgb(104, 119, 132), Intent(Settings.ACTION_SETTINGS))
+            App("Настройки", "settings", Color.rgb(104, 119, 132), Intent(this, SettingsActivity::class.java))
         ).forEach { app ->
             dock.addView(appTile(app, compact = true), LinearLayout.LayoutParams(0, dp(62), 1f))
         }
@@ -291,7 +291,7 @@ class HomeActivity : Activity() {
         AlertDialog.Builder(this)
             .setView(panel)
             .setNegativeButton("Закрыть", null)
-            .setNeutralButton("Все настройки") { _, _ -> launch(Intent(Settings.ACTION_SETTINGS)) }
+            .setNeutralButton("Все настройки") { _, _ -> launch(Intent(this, SettingsActivity::class.java)) }
             .show()
     }
 
