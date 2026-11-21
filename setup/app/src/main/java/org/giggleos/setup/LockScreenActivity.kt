@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.BatteryManager
@@ -100,12 +102,17 @@ class LockScreenActivity : Activity() {
             val wallpaper = GiggleAppearance.wallpaperColors(this@LockScreenActivity)
             background = GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                intArrayOf(
-                    wallpaper.first,
-                    wallpaper.second,
-                    Color.rgb(14, 31, 48)
-                )
+                intArrayOf(wallpaper.first, wallpaper.second, Color.rgb(14, 31, 48))
             )
+        }
+        loadCustomWallpaper()?.let { drawable ->
+            root.background = drawable
+            root.addView(View(this).apply {
+                background = GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    intArrayOf(Color.argb(78, 8, 22, 34), Color.argb(150, 8, 22, 34))
+                )
+            }, FrameLayout.LayoutParams(-1, -1))
         }
 
         // Restrained ambient light gives depth without expensive blur effects.
@@ -269,6 +276,24 @@ class LockScreenActivity : Activity() {
         }
         content.addView(footer)
         setContentView(root)
+    }
+
+    private fun loadCustomWallpaper(): BitmapDrawable? {
+        val uri = GiggleAppearance.customWallpaperUri(this) ?: return null
+        return try {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+            val target = maxOf(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels)
+            var sample = 1
+            while (bounds.outWidth / sample > target * 2 || bounds.outHeight / sample > target * 2) sample *= 2
+            val options = BitmapFactory.Options().apply { inSampleSize = sample }
+            val bitmap = contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
+                ?: return null
+            BitmapDrawable(resources, bitmap).apply { gravity = Gravity.FILL }
+        } catch (_: Exception) {
+            null
+        }
     }
 
     private fun refreshSecurityStatus() {
